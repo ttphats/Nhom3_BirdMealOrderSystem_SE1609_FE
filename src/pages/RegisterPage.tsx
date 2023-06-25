@@ -1,7 +1,11 @@
-export default function RegisterPage() {
-    return (
-      <>
-      RegisterPage ne
-      </>
-    );
-  }
+import { Register } from "../common/components/Login";
+
+const RegisterPage = () => {
+
+  return (
+    <Register />
+  );
+};
+
+export default RegisterPage;
+

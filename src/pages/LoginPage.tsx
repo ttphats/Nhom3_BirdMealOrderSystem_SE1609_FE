@@ -1,7 +1,7 @@
+import { Login } from "../common/components/Login";
+
 export default function LoginPage() {
-    return (
-      <>
-      LoginPage ne
-      </>
-    );
-  }
+  return (
+      <Login />
+  );
+}

@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouteObject } from "react-router-dom";
 
-import { MainLayout } from "../layouts/";
+import { LoginLayout, MainLayout } from "../layouts/";
 import {
   ComboPage,
   ComboDetailsPage,
@@ -44,13 +44,20 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: AppRoutes.login,
-    element: <LoginPage />,
+    path: '/',
+    element: <LoginLayout />,
+    children: [
+      {
+        path: AppRoutes.login,
+        element: <LoginPage />,
+      },
+      {
+        path: AppRoutes.register,
+        element: <RegisterPage />,
+      },
+    ]
   },
-  {
-    path: AppRoutes.register,
-    element: <RegisterPage />,
-  },
+  
 ];
 
 const router = createBrowserRouter(routes);
