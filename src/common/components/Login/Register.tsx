@@ -1,5 +1,5 @@
 import {
-    Avatar,
+  Avatar,
   Box,
   Button,
   FormControlLabel,
@@ -9,13 +9,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { literal, object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import Copyright from "../Copyright";
+import AppRoutes from "../../../router/AppRoutes";
+import { useNavigate } from "react-router-dom";
 
 const registerSchema = object({
   name: string()
@@ -38,6 +40,11 @@ const registerSchema = object({
 type registerinput = TypeOf<typeof registerSchema>;
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  const routeChange = (path: string) => {
+    navigate(path, { replace: true });
+  };
   const {
     register,
     formState: { errors, isSubmitSuccessful },
@@ -154,7 +161,7 @@ const Register = () => {
           Register
         </Button>
       </Box>
-      <Link href="/login" variant="body2" sx={{ m: 2 }}>
+      <Link variant="body2" sx={{ m: 2 , cursor: "pointer"}} onClick={() => routeChange(AppRoutes.login)}>
         Already have an account? Sign in
       </Link>
       <Copyright sx={{ m: 2 }} />

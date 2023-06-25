@@ -13,6 +13,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Copyright from "../Copyright";
+import AppRoutes from "../../../router/AppRoutes";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = object({
   email: string().nonempty("Email is required").email("Email is invalid"),
@@ -25,6 +27,11 @@ const loginSchema = object({
 type logininput = TypeOf<typeof loginSchema>;
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  const routeChange = (path: string) => {
+    navigate(path, { replace: true });
+  };
   const {
     register,
     formState: { errors, isSubmitSuccessful },
@@ -127,7 +134,7 @@ export default function Login() {
               </Link>
             </Grid>
             <Grid item>
-              <Link href="/register" variant="body2">
+              <Link variant="body2" sx={{ m: 2 , cursor: "pointer"}} onClick={() => routeChange(AppRoutes.register)}>
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
