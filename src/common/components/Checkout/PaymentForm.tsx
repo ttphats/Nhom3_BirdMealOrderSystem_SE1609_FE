@@ -4,7 +4,9 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import SendIcon from '@mui/icons-material/Send';
 
 export interface PaymentFormData {
   cardName: string;
@@ -52,29 +54,29 @@ export default function PaymentForm({
               label="Name on card"
               fullWidth
               variant="standard"
-              value={paymentFormData.cardName || ""}
+              value={paymentFormData.cardName}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
               id="cardNumber"
-              required
               label="Card number"
+              required
               fullWidth
               variant="standard"
-              value={paymentFormData.cardNumber || ""}
+              value={paymentFormData.cardNumber}
               onChange={handleChange}
             />
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField
               id="expDate"
-              required
               label="Expiry date"
+              required
               fullWidth
               variant="standard"
-              value={paymentFormData.expDate || ""}
+              value={paymentFormData.expDate}
               onChange={handleChange}
             />
           </Grid>
@@ -86,7 +88,7 @@ export default function PaymentForm({
               helperText="Last three digits on signature strip"
               fullWidth
               variant="standard"
-              value={paymentFormData.cvv || ""}
+              value={paymentFormData.cvv}
               onChange={handleChange}
             />
           </Grid>
@@ -104,8 +106,14 @@ export default function PaymentForm({
             />
           </Grid>
         </Grid>
-        <Button onClick={handleBack} variant="contained">Back</Button>
-        <Button type="submit" variant="contained">Next</Button>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between'}}>
+          <Button onClick={handleBack} variant="text" startIcon={<ArrowBackIosIcon />}>
+            Back
+          </Button>
+          <Button type="submit" variant="contained" endIcon={<SendIcon />}>
+            Next
+          </Button>
+        </Box>
       </form>
     </React.Fragment>
   );

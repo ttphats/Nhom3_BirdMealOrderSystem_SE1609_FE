@@ -8,16 +8,20 @@ import { useLocation } from "react-router-dom";
 import { CartItemType } from "../../../pages/ComboPage";
 import { AddressFormData } from "./AddressForm";
 import { PaymentFormData } from "./PaymentForm";
-import { Button, Snackbar } from "@mui/material";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import SendIcon from '@mui/icons-material/Send';
 
 interface PaymentFormProps {
   formData: AddressFormData;
   paymentFormData: PaymentFormData;
+  handleBack: () => void;
 }
 
 export default function Review({
   formData,
   paymentFormData,
+  handleBack,
 }: PaymentFormProps) {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const location = useLocation();
@@ -26,9 +30,22 @@ export default function Review({
 
   const payments = [
     { name: "Card type", detail: "Visa" },
-    { name: "Card holder", detail: paymentFormData.cardName ? paymentFormData.cardName : "Thai Thanh Phat"},
-    { name: "Card number", detail: paymentFormData.cardNumber ? paymentFormData.cardNumber : "xxxx-xxxx-xxxx-1234"},
-    { name: "Expiry date", detail: paymentFormData.expDate ? paymentFormData.expDate : "04/2024" },
+    {
+      name: "Card holder",
+      detail: paymentFormData.cardName
+        ? paymentFormData.cardName
+        : "Thai Thanh Phat",
+    },
+    {
+      name: "Card number",
+      detail: paymentFormData.cardNumber
+        ? paymentFormData.cardNumber
+        : "xxxx-xxxx-xxxx-1234",
+    },
+    {
+      name: "Expiry date",
+      detail: paymentFormData.expDate ? paymentFormData.expDate : "04/2024",
+    },
   ];
 
   useEffect(() => {
@@ -98,15 +115,32 @@ export default function Review({
           </Grid>
         </Grid>
       </Grid>
-      <Button variant="contained" color="primary" onClick={handleConfirmClick}>
-        Confirm Order
-      </Button>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        message="Order placed successfully!"
-      />
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          onClick={handleBack}
+          variant="text"
+          startIcon={<ArrowBackIosIcon />}
+        >
+          Back
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          endIcon={<SendIcon />}
+          onClick={handleConfirmClick}
+        >
+          Confirm Order
+        </Button>
+      </Box>
+      <Snackbar color="success" open={snackbarOpen} autoHideDuration={3000}>
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Order placed successfully!
+        </Alert>
+      </Snackbar>
     </Fragment>
   );
 }

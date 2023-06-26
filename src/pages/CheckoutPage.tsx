@@ -79,7 +79,13 @@ export default function Checkout() {
           />
         );
       case 2:
-        return <Review formData={formData} paymentFormData={paymentFormData} />;
+        return (
+          <Review
+            formData={formData}
+            paymentFormData={paymentFormData}
+            handleBack={handleBack}
+          />
+        );
       default:
         throw new Error("Unknown step");
     }
