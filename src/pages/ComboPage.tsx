@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Badge, Drawer, Grid, IconButton, styled } from "@mui/material";
 import { ComboCard } from "../common/components/Combo";
-import { useQuery } from "react-query";
 import { AddShoppingCart } from "@mui/icons-material";
 import { Cart } from "../common/components/Cart";
 
