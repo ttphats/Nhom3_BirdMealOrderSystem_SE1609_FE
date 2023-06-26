@@ -14,8 +14,8 @@ type Props = {
 const Cart = ({ cartItems, addToCart, removeFromCart }: Props) => {
   const navigate = useNavigate();
 
-  const routeChange = (path: string) => {
-    navigate(path, { replace: true });
+  const routeChange = (path: string, data: CartItemType[]) => {
+    navigate(path, { replace: true, state: data });
   };
   const calculateTotal = (items: CartItemType[]) =>
     items.reduce((acc, item) => acc + item.amount * item.price, 0);
@@ -35,7 +35,7 @@ const Cart = ({ cartItems, addToCart, removeFromCart }: Props) => {
       <h2>Total: {calculateTotal(cartItems).toFixed(2)} VND</h2>
       <Box
         sx={{ display: "flex", m: "auto" }}
-        onClick={() => routeChange(AppRoutes.checkout)}
+        onClick={() => routeChange(AppRoutes.checkout, cartItems)}
       >
         <Button
           variant="contained"

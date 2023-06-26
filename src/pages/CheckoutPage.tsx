@@ -1,14 +1,12 @@
-import * as React from "react";
+import { useState, Fragment } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Paper from "@mui/material/Paper";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
@@ -17,28 +15,41 @@ import {
   Review,
 } from "../common/components/Checkout";
 import Copyright from "../common/components/Copyright";
-
+import { AddressFormData } from "../common/components/Checkout/AddressForm";
+import { PaymentFormData } from "../common/components/Checkout/PaymentForm";
 
 const steps = ["Shipping address", "Payment details", "Review your order"];
 
-function getStepContent(step: number) {
-  switch (step) {
-    case 0:
-      return <AddressForm />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-      return <Review />;
-    default:
-      throw new Error("Unknown step");
-  }
-}
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
+const defaultAddressFormData: AddressFormData = {
+  firstName: "",
+  lastName: "",
+  address1: "",
+  address2: "",
+  city: "",
+  state: "",
+  zip: "",
+  country: "",
+  saveAddress: false,
+};
+
+const defaultPaymentFormData: PaymentFormData = {
+  cardName: "",
+  cardNumber: "",
+  expDate: "",
+  cvv: "",
+  saveCard: false,
+};
+
 export default function Checkout() {
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState<AddressFormData>(
+    defaultAddressFormData
+  );
+  const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>(
+    defaultPaymentFormData
+  );
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -46,6 +57,32 @@ export default function Checkout() {
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+  };
+
+  const getStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <AddressForm
+            formData={formData}
+            setFormData={setFormData}
+            handleNext={handleNext}
+          />
+        );
+      case 1:
+        return (
+          <PaymentForm
+            paymentFormData={paymentFormData}
+            setPaymentFormData={setPaymentFormData}
+            handleNext={handleNext}
+            handleBack={handleBack}
+          />
+        );
+      case 2:
+        return <Review formData={formData} paymentFormData={paymentFormData} />;
+      default:
+        throw new Error("Unknown step");
+    }
   };
 
   return (
@@ -83,7 +120,7 @@ export default function Checkout() {
             ))}
           </Stepper>
           {activeStep === steps.length ? (
-            <React.Fragment>
+            <Fragment>
               <Typography variant="h5" gutterBottom>
                 Thank you for your order.
               </Typography>
@@ -92,25 +129,9 @@ export default function Checkout() {
                 confirmation, and will send you an update when your order has
                 shipped.
               </Typography>
-            </React.Fragment>
+            </Fragment>
           ) : (
-            <React.Fragment>
-              {getStepContent(activeStep)}
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                {activeStep !== 0 && (
-                  <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
-                    Back
-                  </Button>
-                )}
-                <Button
-                  variant="contained"
-                  onClick={handleNext}
-                  sx={{ mt: 3, ml: 1 }}
-                >
-                  {activeStep === steps.length - 1 ? "Place order" : "Next"}
-                </Button>
-              </Box>
-            </React.Fragment>
+            <Fragment>{getStepContent(activeStep)}</Fragment>
           )}
         </Paper>
         <Copyright />
