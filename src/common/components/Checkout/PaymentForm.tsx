@@ -51,10 +51,11 @@ export default function PaymentForm({
             <TextField
               id="cardName"
               required
+              name="cardName"
               label="Name on card"
               fullWidth
               variant="standard"
-              value={paymentFormData.cardName}
+              value={paymentFormData.cardName || ""}
               onChange={handleChange}
             />
           </Grid>
@@ -62,10 +63,11 @@ export default function PaymentForm({
             <TextField
               id="cardNumber"
               label="Card number"
+              name="cardNumber"
               required
               fullWidth
               variant="standard"
-              value={paymentFormData.cardNumber}
+              value={paymentFormData.cardNumber || ""}
               onChange={handleChange}
             />
           </Grid>
@@ -73,10 +75,11 @@ export default function PaymentForm({
             <TextField
               id="expDate"
               label="Expiry date"
+              name="expDate"
               required
               fullWidth
               variant="standard"
-              value={paymentFormData.expDate}
+              value={paymentFormData.expDate || ""}
               onChange={handleChange}
             />
           </Grid>
@@ -84,11 +87,12 @@ export default function PaymentForm({
             <TextField
               id="cvv"
               label="CVV"
+              name="cvv"
               required
               helperText="Last three digits on signature strip"
               fullWidth
               variant="standard"
-              value={paymentFormData.cvv}
+              value={paymentFormData.cvv || ""}
               onChange={handleChange}
             />
           </Grid>
