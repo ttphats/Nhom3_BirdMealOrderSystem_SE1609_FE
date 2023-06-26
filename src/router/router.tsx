@@ -9,6 +9,7 @@ import {
   LoginPage,
   ProfilePage,
   RegisterPage,
+  CheckoutPage,
 } from "../pages";
 import AppRoutes from "./AppRoutes";
 
@@ -40,6 +41,10 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.profile,
         element: <ProfilePage />,
+      },
+      {
+        path: AppRoutes.checkout,
+        element: <CheckoutPage />,
       },
     ],
   },

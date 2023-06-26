@@ -53,7 +53,7 @@ export default function Footer() {
               (+84) 938 183 330
             </Typography>
             <Typography margin="15px" color="#363636" fontSize={14} fontWeight={600}>
-              support.hanyu@gmail.com
+              support.bmos-team3@gmail.com
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={3}>
@@ -62,7 +62,7 @@ export default function Footer() {
             </Typography>
             <Stack direction="row" alignItems="center" spacing={2} margin="15px">
               <Link
-                href="https://www.facebook.com/pandahanyu.page"
+                href=""
                 rel="noopener noreferrer"
                 target="_blank"
                 underline="hover"
@@ -74,7 +74,7 @@ export default function Footer() {
                 />
               </Link>
               <Link
-                href="https://www.tiktok.com/@pandahanyu"
+                href=""
                 rel="noopener noreferrer"
                 target="_blank"
                 underline="hover"

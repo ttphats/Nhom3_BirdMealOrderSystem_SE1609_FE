@@ -6,8 +6,14 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Box, LinearProgress, Typography } from "@mui/material";
+import { CartItemType } from "../../../pages/ComboPage";
 
-export default function ComboCard() {
+type Props = {
+  item: CartItemType;
+  handleAddToCart: (clickedItem: CartItemType) => void;
+};
+
+export default function ComboCard({ item, handleAddToCart }: Props) {
   return (
     <Card
       sx={{
@@ -23,8 +29,8 @@ export default function ComboCard() {
       <CardMedia
         component="img"
         height="194"
-        image="https://avianreport.com/wp-content/uploads/2020/07/mosaic_optimized2.jpg"
-        alt="Paella dish"
+        image={item.image}
+        alt={item.title}
       />
       <Box
         sx={{
@@ -41,13 +47,15 @@ export default function ComboCard() {
         }}
       >
         <Typography gutterBottom variant="body1" component="div">
-          Backyard Bird Seed
+        {item.title}
         </Typography>
       </Box>
       <CardContent sx={{ color: "#fff", textAlign: "left", p: 2, pt: 0 }}>
         <Typography variant="body2">
-          Here is your comprehensive guide to the different types of bird seed
-          you can use at your feeders.
+        {item.description}
+        </Typography>
+        <Typography variant="body1" sx={{ color: '#69ec69', fontWeight: 700}}>
+        {item.price} VND
         </Typography>
       </CardContent>
       <Box sx={{ width: "90%", pl: 2, pr: 2 }}>
@@ -67,7 +75,7 @@ export default function ComboCard() {
         <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
           <FavoriteIcon />
         </IconButton>
-        <IconButton aria-label="share" sx={{ color: "#fff" }}>
+        <IconButton aria-label="share" sx={{ color: "#fff" }} onClick={() => handleAddToCart(item)}>
           <AddShoppingCartIcon />
         </IconButton>
       </CardActions>
