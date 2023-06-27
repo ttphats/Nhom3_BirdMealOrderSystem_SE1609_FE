@@ -15,8 +15,8 @@ import { literal, object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import Checkbox from "@mui/material/Checkbox";
-import Copyright from "../Copyright";
-import AppRoutes from "../../../router/AppRoutes";
+import Copyright from "../../common/components/Copyright";
+import AppRoutes from "../../router/AppRoutes";
 import { useNavigate } from "react-router-dom";
 
 const registerSchema = object({

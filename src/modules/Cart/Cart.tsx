@@ -1,9 +1,9 @@
 import { Box, Button } from "@mui/material";
 import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
-import { CartItemType } from "../../../pages/ComboPage";
+import { CartItemType } from "../../pages/ComboPage";
 import CartItem from "./CartItems";
 import { useNavigate } from "react-router-dom";
-import AppRoutes from "../../../router/AppRoutes";
+import AppRoutes from "../../router/AppRoutes";
 
 type Props = {
   cartItems: CartItemType[];

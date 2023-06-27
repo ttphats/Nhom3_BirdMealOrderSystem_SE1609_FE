@@ -7,7 +7,7 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { CartItemType } from "../../../pages/ComboPage";
+import { CartItemType } from "../../pages/ComboPage";
 
 type Props = {
   item: CartItemType;

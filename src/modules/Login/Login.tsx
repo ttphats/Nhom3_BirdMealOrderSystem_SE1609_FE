@@ -12,8 +12,8 @@ import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Copyright from "../Copyright";
-import AppRoutes from "../../../router/AppRoutes";
+import Copyright from "../../common/components/Copyright";
+import AppRoutes from "../../router/AppRoutes";
 import { useNavigate } from "react-router-dom";
 
 const loginSchema = object({

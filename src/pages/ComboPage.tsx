@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Badge, Drawer, Grid, IconButton, styled } from "@mui/material";
-import { ComboCard } from "../common/components/Combo";
+import { ComboCard } from "../modules/Combo";
 import { AddShoppingCart } from "@mui/icons-material";
-import { Cart } from "../common/components/Cart";
+import { Cart } from "../modules/Cart";
 
 export type CartItemType = {
   id: number;

@@ -13,10 +13,10 @@ import {
   PaymentForm,
   AddressForm,
   Review,
-} from "../common/components/Checkout";
+} from "../modules/Checkout";
 import Copyright from "../common/components/Copyright";
-import { AddressFormData } from "../common/components/Checkout/AddressForm";
-import { PaymentFormData } from "../common/components/Checkout/PaymentForm";
+import { AddressFormData } from "../modules/Checkout/AddressForm";
+import { PaymentFormData } from "../modules/Checkout/PaymentForm";
 
 const steps = ["Shipping address", "Payment details", "Review your order"];
 

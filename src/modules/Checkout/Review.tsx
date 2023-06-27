@@ -5,7 +5,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Grid from "@mui/material/Grid";
 import { useLocation } from "react-router-dom";
-import { CartItemType } from "../../../pages/ComboPage";
+import { CartItemType } from "../../pages/ComboPage";
 import { AddressFormData } from "./AddressForm";
 import { PaymentFormData } from "./PaymentForm";
 import { Alert, Box, Button, Snackbar } from "@mui/material";

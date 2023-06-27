@@ -6,7 +6,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Box, LinearProgress, Typography } from "@mui/material";
-import { CartItemType } from "../../../pages/ComboPage";
+import { CartItemType } from "../../pages/ComboPage";
 
 type Props = {
   item: CartItemType;
