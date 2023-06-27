@@ -4,6 +4,7 @@ import persistReducer from "redux-persist/lib/persistReducer";
 import storage from "redux-persist/lib/storage";
 
 import authReducer from "./slices/authSlice";
+import profileReducer from "./slices/profileSlice";
 
 const persistConfig = {
   key: "root",
@@ -14,6 +15,7 @@ const persistConfig = {
 
 const rootReducers = combineReducers({
   auth: authReducer,
+  profile: profileReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);

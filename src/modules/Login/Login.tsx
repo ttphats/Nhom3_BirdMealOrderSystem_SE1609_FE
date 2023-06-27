@@ -14,20 +14,27 @@ import { object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Copyright from "../../common/components/Copyright";
 import AppRoutes from "../../router/AppRoutes";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import authApi from "./apis/authApi";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { login } from "../../redux/slices/authSlice";
+import { toast } from "react-toastify";
+import { fetchUserProfile } from "../../redux/slices/profileSlice";
 
 const loginSchema = object({
   email: string().nonempty("Email is required").email("Email is invalid"),
   password: string()
     .nonempty("Password is required")
-    .min(8, "Password must be more than 8 characters")
-    .max(32, "Password must be less than 32 characters"),
+    .min(6, "Password must be more than 8 characters")
+    .max(100, "Password must be less than 32 characters"),
 });
 
 type logininput = TypeOf<typeof loginSchema>;
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
 
   const routeChange = (path: string) => {
     navigate(path, { replace: true });
@@ -48,9 +55,24 @@ export default function Login() {
   }, [isSubmitSuccessful, reset]);
 
   const onSubmitHandler: SubmitHandler<logininput> = (values) => {
+    authApi
+          .login({
+            email: values.email.trim().toLowerCase(),
+            password: values.password,
+          })
+          .then((response) => {
+            dispatch(login(response.data.accessToken));
+            dispatch(fetchUserProfile());
+            navigate(AppRoutes.home);
+            toast.success("Đăng nhập thành công");
+          })
+          .catch(() => {
+            toast.error("Email hoặc mật khẩu không chính xác.");
+          });
     console.log(values);
   };
   console.log(errors);
+  if (auth.isAuthenticated) return <Navigate to={AppRoutes.home} />;
 
   return (
     <>

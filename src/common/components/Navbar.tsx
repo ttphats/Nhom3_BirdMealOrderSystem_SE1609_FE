@@ -19,6 +19,10 @@ import {
 import IconButton from "@mui/material/IconButton";
 
 import AppRoutes from "../../router/AppRoutes";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { AccountMenu } from ".";
+import { logout } from "../../redux/slices/authSlice";
+import { remove } from "../../redux/slices/profileSlice";
 
 interface Props {
   /**
@@ -55,6 +59,8 @@ const navItems = [
 export default function Navbar({ window }: Props) {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -80,6 +86,29 @@ export default function Navbar({ window }: Props) {
             </ListItemButton>
           </ListItem>
         ))}
+        {auth.isAuthenticated ? (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
+                onClick={() => routeChange(AppRoutes.profile)}
+              >
+                <ListItemText primary="Tài khoản" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
+                onClick={() => () => {
+                  dispatch(logout());
+                  dispatch(remove());
+                }}
+              >
+                <ListItemText primary="Đăng xuất" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        ) : (
           <>
             <ListItem disablePadding>
               <ListItemButton
@@ -98,6 +127,7 @@ export default function Navbar({ window }: Props) {
               </ListItemButton>
             </ListItem>
           </>
+        )}
       </List>
     </Box>
   );
@@ -194,6 +224,11 @@ export default function Navbar({ window }: Props) {
               justifyContent: "space-between",
             }}
           >
+            {auth.isAuthenticated ? (
+              <Box sx={{ m: 1, display: "flex", alignItems: "center", cursor: "pointer" }}>
+                <AccountMenu />
+              </Box>
+            ) : (
               <>
                 <Box sx={{ m: 1 }}>
                   <Button
@@ -226,6 +261,7 @@ export default function Navbar({ window }: Props) {
                   </Button>
                 </Box>
               </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>

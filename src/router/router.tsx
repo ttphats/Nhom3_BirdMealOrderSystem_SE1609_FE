@@ -31,6 +31,10 @@ const routes: RouteObject[] = [
         element: <ComboDetailsPage />,
       },
       {
+        path: AppRoutes.product,
+        element: <CheckoutPage />,
+      },
+      {
         path: AppRoutes.order,
         element: <OrderPage />,
       },

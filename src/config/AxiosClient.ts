@@ -3,7 +3,7 @@ import { store } from "../redux/store";
 
 // Set config defaults when creating the instance
 const AxiosClient = axios.create({
-  baseURL: "https://hnbe.online/hanyu-be/api",
+  baseURL: "https://localhost:7052/api",
 });
 
 // Add a request interceptor
