@@ -12,6 +12,7 @@ import {
   CheckoutPage,
 } from "../pages";
 import AppRoutes from "./AppRoutes";
+import ProductPage from "../pages/ProductPage";
 
 const routes: RouteObject[] = [
   {
@@ -32,7 +33,7 @@ const routes: RouteObject[] = [
       },
       {
         path: AppRoutes.product,
-        element: <CheckoutPage />,
+        element: <ProductPage />,
       },
       {
         path: AppRoutes.order,

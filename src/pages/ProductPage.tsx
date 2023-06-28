@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { Badge, Drawer, Grid, IconButton, styled } from "@mui/material";
 import { AddShoppingCart } from "@mui/icons-material";
 import { Cart } from "../modules/Cart";
-import { ComboCard } from "../modules/Combo";
-import { CartItemType } from "../modules/Cart/CartItemType";
+import ProductCard from "../modules/Product/ProductCard";
+import { Product } from "../modules/Product/models";
+import productApi from "../modules/Product/apis/productApi";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { Combo } from "../modules/Combo/models";
-import comboApi from "../modules/Combo/apis/comboApi";
-import { addToCart, removeCartItem, updateCartItemQuantity } from "../redux/slices/cartSlice";
+import { CartItemType } from "../modules/Cart/CartItemType";
+import {
+  addToCart,
+  removeCartItem,
+  updateCartItemQuantity,
+} from "../redux/slices/cartSlice";
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -22,25 +26,26 @@ const StyledButton = styled(IconButton)`
   top: 100px;
 `;
 
-export default function ComboPage() {
+export default function ProductPage() {
   const [cartOpen, setCartOpen] = useState(false);
-  const [combos, setCombos] = useState<Combo[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
 
-  const fetchListConbo = () => {
-    comboApi
+  const fetchListProduct = () => {
+    productApi
       .fetch()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((response: any) => {
-        const combos = response.data;
-        setCombos(combos);
+        const products = response.data;
+        console.log(products);
+        setProducts(products);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    fetchListConbo();
+    fetchListProduct();
   }, []);
 
   const getTotalItems = (items: CartItemType[]): number => {
@@ -50,25 +55,22 @@ export default function ComboPage() {
       0
     );
   };
-  const handleAddToCart = (item: Combo) => {
-    const existingCartItemIndex: number = cartItems.findIndex(
-      (cartItem) => cartItem.combo?.id === item.id
+  const handleAddToCart = (item: Product) => {
+    const existingCartItem = cartItems.find(
+      (cartItem) => cartItem.product?.id === item.id
     );
-  
-    if (existingCartItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      updatedCartItems[existingCartItemIndex] = {
-        ...updatedCartItems[existingCartItemIndex],
-        comboQuantity: (updatedCartItems[existingCartItemIndex].comboQuantity ?? 0) + 1,
-      };
-      const quantity = updatedCartItems[existingCartItemIndex].comboQuantity || 0; // Handle undefined case
-      dispatch(updateCartItemQuantity({
-        item: updatedCartItems[existingCartItemIndex],
-        quantity,
-        isProduct: false,
-      }));
+
+    if (existingCartItem) {
+      const updatedQuantity = (existingCartItem.productQuantity ?? 0) + 1;
+      dispatch(
+        updateCartItemQuantity({
+          item: existingCartItem,
+          quantity: updatedQuantity,
+          isProduct: true,
+        })
+      );
     } else {
-      dispatch(addToCart({ combo: item, comboQuantity: 1 }));
+      dispatch(addToCart({ product: item, productQuantity: 1 }));
     }
   };
 
@@ -95,7 +97,7 @@ export default function ComboPage() {
 
   return (
     <>
-       <Drawer anchor="right" open={cartOpen} onClose={() => setCartOpen(false)}>
+      <Drawer anchor="right" open={cartOpen} onClose={() => setCartOpen(false)}>
         <Cart
           cartItems={cartItems}
           removeCartItem={handleRemoveItem}
@@ -108,9 +110,9 @@ export default function ComboPage() {
         </Badge>
       </StyledButton>
       <Grid container spacing={2} sx={{ m: 2 }}>
-        {combos?.map((item) => (
+        {products?.map((item) => (
           <Grid key={item.id} item xs={12} md={3}>
-            <ComboCard
+            <ProductCard
               item={item}
               handleAddToCart={handleAddToCart}
             />

@@ -6,14 +6,17 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Box, LinearProgress, Typography } from "@mui/material";
-import { Combo } from "./models";
+import { Product } from "./models";
 
 type Props = {
-  item: Combo;
-  handleAddToCart: (clickedItem: Combo) => void;
+  item: Product;
+  handleAddToCart: (clickedItem: Product) => void;
 };
 
-export default function ComboCard({ item, handleAddToCart }: Props) {
+export default function ProductCard({
+  item,
+  handleAddToCart,
+}: Props) {
   return (
     <Card
       sx={{
@@ -55,12 +58,15 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
           component="div"
           sx={{ fontSize: "14px " }}
         >
-        {item.name}
+          {item.name}
         </Typography>
       </Box>
       <CardContent sx={{ color: "#fff", textAlign: "left", p: 2, pt: 0 }}>
-        <Typography variant="body1" sx={{ color: '#69ec69', fontWeight: 700}}>
-        {item.price.toLocaleString('it-IT', {style : 'currency', currency : 'VND'})}
+        <Typography variant="body1" sx={{ color: "#69ec69", fontWeight: 700 }}>
+          {item.price.toLocaleString("it-IT", {
+            style: "currency",
+            currency: "VND",
+          })}
         </Typography>
       </CardContent>
       <Box sx={{ width: "90%", pl: 2, pr: 2 }}>
@@ -80,7 +86,11 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
         <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
           <FavoriteIcon />
         </IconButton>
-        <IconButton aria-label="share" sx={{ color: "#fff" }} onClick={() => handleAddToCart(item)}>
+        <IconButton
+          aria-label="share"
+          sx={{ color: "#fff" }}
+          onClick={() => handleAddToCart(item)}
+        >
           <AddShoppingCartIcon />
         </IconButton>
       </CardActions>

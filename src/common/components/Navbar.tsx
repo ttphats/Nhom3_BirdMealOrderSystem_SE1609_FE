@@ -39,8 +39,8 @@ const navItems = [
     path: AppRoutes.combo,
   },
   {
-    title: "Combo Details",
-    path: AppRoutes.combodetails,
+    title: "Product",
+    path: AppRoutes.product,
   },
   {
     title: "Orders",

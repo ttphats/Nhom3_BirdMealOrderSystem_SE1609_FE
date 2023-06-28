@@ -9,6 +9,7 @@ import { Button } from "@mui/material";
 export interface AddressFormData {
   firstName: string;
   lastName: string;
+  phoneNum: string;
   address1: string;
   address2: string;
   city: string;
@@ -70,6 +71,19 @@ export default function AddressForm({
               autoComplete="family-name"
               variant="standard"
               value={formData.lastName || ""}
+              onChange={handleChange}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              required
+              id="phoneNum"
+              name="phoneNum"
+              label="Phone Number"
+              fullWidth
+              autoComplete="phoneNum-line1"
+              variant="standard"
+              value={formData.phoneNum || ""}
               onChange={handleChange}
             />
           </Grid>

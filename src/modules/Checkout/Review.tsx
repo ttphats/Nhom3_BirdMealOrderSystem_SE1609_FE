@@ -1,16 +1,19 @@
-import { useState, Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Grid from "@mui/material/Grid";
-import { useLocation } from "react-router-dom";
-import { CartItemType } from "../../pages/ComboPage";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AddressFormData } from "./AddressForm";
 import { PaymentFormData } from "./PaymentForm";
-import { Alert, Box, Button, Snackbar } from "@mui/material";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import SendIcon from '@mui/icons-material/Send';
+import { Box, Button } from "@mui/material";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import SendIcon from "@mui/icons-material/Send";
+import { CartItemType } from "../Cart/CartItemType";
+import checkOutApi from "./apis/checkOutApi";
+import { toast } from "react-toastify";
+import AppRoutes from "../../router/AppRoutes";
 
 interface PaymentFormProps {
   formData: AddressFormData;
@@ -23,10 +26,20 @@ export default function Review({
   paymentFormData,
   handleBack,
 }: PaymentFormProps) {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const location = useLocation();
   const cartItems = location.state;
-  const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
+
+  const address =
+    formData.address1 +
+    ", " +
+    formData.address2 +
+    ", " +
+    formData.city +
+    ", " +
+    formData.state +
+    ", " +
+    formData.country;
 
   const payments = [
     { name: "Card type", detail: "Visa" },
@@ -48,21 +61,27 @@ export default function Review({
     },
   ];
 
-  useEffect(() => {
-    const totalPrice = cartItems.reduce(
-      (acc: number, item: CartItemType) => acc + item.price,
-      0
-    );
-
-    setTotal(totalPrice);
-  }, [cartItems]);
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+  const calculateTotalPrice = () => {
+    return cartItems.reduce((total: number, item: CartItemType) => {
+      if (item.product) {
+        return total + item.product.price * item.productQuantity!;
+      } else if (item.combo) {
+        return total + item.combo.price * item.comboQuantity!;
+      }
+      return total;
+    }, 0);
   };
 
   const handleConfirmClick = () => {
-    setSnackbarOpen(true);
+    checkOutApi
+      .order(address, formData.phoneNum, cartItems)
+      .then(() => {
+        toast.success("Order successfully");
+        navigate(AppRoutes.home);
+      })
+      .catch(() => {
+        toast.error("Something wrong, check again!");
+      });
   };
 
   return (
@@ -72,15 +91,30 @@ export default function Review({
       </Typography>
       <List disablePadding>
         {cartItems.map((item: CartItemType) => (
-          <ListItem key={item.title} sx={{ py: 1, px: 0 }}>
-            <ListItemText primary={item.title} secondary={item.description} />
-            <Typography variant="body2">{item.price} VND</Typography>
+          <ListItem
+            key={item.product?.id || item.combo?.id}
+            sx={{ py: 1, px: 0 }}
+          >
+            <ListItemText primary={item.product?.name || item.combo?.name} />
+            <Typography variant="body2">
+              {item.product?.price.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              }) ||
+                item.combo?.price.toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}{" "}
+            </Typography>
           </ListItem>
         ))}
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary="Total" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            {total} VND
+            {calculateTotalPrice().toLocaleString("it-IT", {
+              style: "currency",
+              currency: "VND",
+            })}
           </Typography>
         </ListItem>
       </List>
@@ -132,15 +166,6 @@ export default function Review({
           Confirm Order
         </Button>
       </Box>
-      <Snackbar color="success" open={snackbarOpen} autoHideDuration={3000}>
-        <Alert
-          onClose={handleSnackbarClose}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          Order placed successfully!
-        </Alert>
-      </Snackbar>
     </Fragment>
   );
 }

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Button,
@@ -7,12 +8,16 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { CartItemType } from "../../pages/ComboPage";
+import { CartItemType } from "./CartItemType";
 
 type Props = {
   item: CartItemType;
-  addToCart: (clickedItem: CartItemType) => void;
-  removeFromCart: (id: number) => void;
+  removeCartItem: (item: CartItemType) => void;
+  updateCartItemQuantity: (
+    item: CartItemType,
+    quantity: number,
+    isProduct: boolean
+  ) => void;
 };
 
 const Img = styled("img")({
@@ -22,68 +27,155 @@ const Img = styled("img")({
   maxHeight: "100%",
 });
 
-const CartItem = ({ item, addToCart, removeFromCart }: Props) => {
+const CartItem: React.FC<Props> = ({
+  item,
+  removeCartItem,
+  updateCartItemQuantity,
+}) => {
+  const handleRemoveFromCart = () => {
+    removeCartItem(item);
+  };
+
+  const handleUpdateQuantity = (isProduct: boolean, quantity: number) => {
+    updateCartItemQuantity(item, quantity, isProduct);
+  };
+
+  const getItemPrice = (): number => {
+    if (item.product) {
+      return (item.product.price || 0) * (item.productQuantity || 0);
+    } else if (item.combo) {
+      return (item.combo.price || 0) * (item.comboQuantity || 0);
+    }
+    return 0;
+  };
+
+  const getItemTitle = (): string => {
+    if (item.product) {
+      return item.product.name;
+    } else if (item.combo) {
+      return item.combo.name;
+    }
+    return "";
+  };
+
+  const handleIncrementQuantity = (isProduct: boolean) => {
+    const newQuantity = isProduct
+      ? (item.productQuantity ?? 0) + 1
+      : (item.comboQuantity ?? 0) + 1;
+    handleUpdateQuantity(isProduct, newQuantity);
+  };
+
+  const handleDecrementQuantity = (isProduct: boolean) => {
+    const currentQuantity = isProduct
+      ? item.productQuantity ?? 0
+      : item.comboQuantity ?? 0;
+
+    if (currentQuantity - 1 > 0) {
+      const newQuantity = currentQuantity - 1;
+      handleUpdateQuantity(isProduct, newQuantity);
+    } else {
+      removeCartItem(item);
+    }
+  };
+
   return (
     <Paper
       sx={{
         p: 2,
         margin: "auto",
-        mb: 2,
         maxWidth: 500,
         flexGrow: 1,
-        backgroundColor: "#081d3a",
+        backgroundColor: "#282d3e",
         color: "#fff",
+        mb: 2,
       }}
     >
       <Grid container spacing={2}>
         <Grid item>
           <ButtonBase sx={{ width: 128, height: 128 }}>
-            <Img alt="complex" src={item.image} />
+            {(item.product && (
+              <Img alt="Product" src={item.product.imgUrl} />
+            )) ||
+              (item.combo && <Img alt="Product" src={item.combo.imgUrl} />)}
           </ButtonBase>
         </Grid>
         <Grid item xs={12} sm container>
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
               <Typography gutterBottom variant="subtitle1" component="div">
-                {item.title}
+                {getItemTitle()}
               </Typography>
-              <Typography variant="body2" gutterBottom>
-                {item.description}
-              </Typography>
-              <Box sx= {{display: 'flex', justifyContent: 'space-between'}}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                {item.product ? (
+                  <Button
+                    size="small"
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleDecrementQuantity(true)}
+                  >
+                    -
+                  </Button>
+                ) : (
+                  <Button
+                    size="small"
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleDecrementQuantity(false)}
+                  >
+                    -
+                  </Button>
+                )}
+
+                <p>
+                  {item.product
+                    ? item.productQuantity
+                    : item.combo && item.comboQuantity}
+                </p>
+                {item.product ? (
+                  <Button
+                    size="small"
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleIncrementQuantity(true)}
+                  >
+                    +
+                  </Button>
+                ) : (
+                  <Button
+                    size="small"
+                    disableElevation
+                    variant="contained"
+                    onClick={() => handleIncrementQuantity(false)}
+                  >
+                    +
+                  </Button>
+                )}
                 <Button
                   size="small"
                   disableElevation
                   variant="contained"
-                  onClick={() => removeFromCart(item.id)}
+                  color="error"
+                  onClick={handleRemoveFromCart}
                 >
-                  -
-                </Button>
-                <Typography variant="body2">{item.amount}</Typography>
-                <Button
-                  size="small"
-                  disableElevation
-                  variant="contained"
-                  onClick={() => addToCart(item)}
-                >
-                  +
+                  Remove
                 </Button>
               </Box>
             </Grid>
             <Grid item>
-              <Typography sx={{ cursor: "pointer" }} variant="body2">
-                Total: {(item.amount * item.price).toFixed(2)} VND
+              <Typography variant="subtitle1" component="div">
+                Total:{" "}
+                {getItemPrice().toLocaleString("it-IT", {
+                  style: "currency",
+                  currency: "VND",
+                })}
               </Typography>
             </Grid>
-          </Grid>
-          <Grid item>
-            <Typography
-              variant="subtitle1"
-              component="div"
-              sx={{ color: "#69ec69" }}
-            >
-              {item.price}
-            </Typography>
           </Grid>
         </Grid>
       </Grid>

@@ -25,14 +25,14 @@ const initialState: ProfileState = {
   user: {
     message: "",
     data: {
-      id: "",
-      email: "",
-      fullname: "",
-      phoneNum: "",
-      address: "",
-      status: "",
-      role: "",
-    },
+        id: "",
+    email: "",
+    fullname: "",
+    phoneNum: "",
+    address: "",
+    status: "",
+    role: "",
+    }
   },
 };
 
@@ -49,12 +49,9 @@ export const profileSlice = createSlice({
   extraReducers: (builder) => {
     // Add reducers for additional action types here, and handle loading state as needed
     builder
-      .addCase(
-        fetchUserProfile.fulfilled,
-        (state, action: PayloadAction<models.User>) => {
-          state.user = action.payload;
-        }
-      )
+      .addCase(fetchUserProfile.fulfilled, (state, action: PayloadAction<models.User>) => {
+        state.user = action.payload;
+      })
       .addCase(fetchUserProfile.rejected, (state) => {
         state.user = {
           ...initialState.user,
