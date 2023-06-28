@@ -9,6 +9,8 @@ const authApi = {
   login: (
     payload: LoginForm
   ): Promise<{
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any;
     accessToken: string;
   }> => {
     return AxiosClient.post("/Auth/login", payload);
