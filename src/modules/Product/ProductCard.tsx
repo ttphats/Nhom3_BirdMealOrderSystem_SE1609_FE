@@ -9,6 +9,8 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Box, Typography, styled } from "@mui/material";
 import { Product } from "./models";
 import { useAppSelector } from "../../redux/hooks";
+import { useNavigate } from "react-router-dom";
+import AppRoutes from "../../router/AppRoutes";
 
 type Props = {
   item: Product;
@@ -25,11 +27,12 @@ const StyledInfo = styled("div")(({ theme }) => ({
 
 export default function ProductCard({ item, handleAddToCart }: Props) {
   const user = useAppSelector((state) => state.profile.user.data);
+  const navigate = useNavigate();
   return (
     <Card
       sx={{
         width: "270px",
-        height: "350px",
+        height: "390px",
         position: "relative",
         backgroundColor: "#272d40",
         borderRadius: 3,
@@ -96,7 +99,13 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
         </Typography>
       </CardContent>
       {item.status == "Active" && user.role == "Staff" ? (
-        <StyledInfo sx={{ justifyContent: "flex-end", position: 'relative', bottom: '15px' }}>
+        <StyledInfo
+          sx={{
+            justifyContent: "flex-end",
+            position: "relative",
+            bottom: "15px",
+          }}
+        >
           <Box
             key={item.id}
             sx={{
@@ -118,7 +127,13 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
         <></>
       )}
       {item.status == "OutOfStock" && user.role == "Staff" ? (
-        <StyledInfo sx={{ justifyContent: "flex-end", position: 'relative', bottom: '15px' }}>
+        <StyledInfo
+          sx={{
+            justifyContent: "flex-end",
+            position: "relative",
+            bottom: "15px",
+          }}
+        >
           <Box
             key={item.id}
             sx={{
@@ -138,7 +153,30 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
         <></>
       )}
       {/* Customer Action Block */}
-      {user.role == "Customer" && (
+      {user.role == "Customer" ||
+        (!user.role && (
+          <CardActions
+            disableSpacing
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              bottom: 0,
+            }}
+          >
+            <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
+              <FavoriteIcon />
+            </IconButton>
+            <IconButton
+              aria-label="share"
+              sx={{ color: "#fff" }}
+              onClick={() => handleAddToCart(item)}
+            >
+              <AddShoppingCartIcon />
+            </IconButton>
+          </CardActions>
+        ))}
+      {/* Guest Action Block */}
+      {!user.role && (
         <CardActions
           disableSpacing
           sx={{
@@ -153,7 +191,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           <IconButton
             aria-label="share"
             sx={{ color: "#fff" }}
-            onClick={() => handleAddToCart(item)}
+            onClick={() => navigate(AppRoutes.login, { replace: true })}
           >
             <AddShoppingCartIcon />
           </IconButton>

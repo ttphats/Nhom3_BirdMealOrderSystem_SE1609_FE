@@ -10,6 +10,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box, LinearProgress, Typography } from "@mui/material";
 import { Combo } from "./models";
 import { useAppSelector } from "../../redux/hooks";
+import { useNavigate } from "react-router-dom";
+import AppRoutes from "../../router/AppRoutes";
 
 type Props = {
   item: Combo;
@@ -18,6 +20,7 @@ type Props = {
 
 export default function ComboCard({ item, handleAddToCart }: Props) {
   const user = useAppSelector((state) => state.profile.user.data);
+  const navigate = useNavigate();
 
   return (
     <Card
@@ -121,6 +124,30 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
             aria-label="share"
             sx={{ color: "#fff" }}
             onClick={() => handleAddToCart(item)}
+          >
+            <AddShoppingCartIcon />
+          </IconButton>
+        </CardActions>
+      )}
+      {/* Guest Action Block */}
+
+      {!user.role && (
+        <CardActions
+          disableSpacing
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            bottom: 0,
+          }}
+        >
+          <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
+            <FavoriteIcon />
+          </IconButton>
+          <IconButton
+            aria-label="share"
+            sx={{ color: "#fff" }}
+            onClick={() => navigate(AppRoutes.login, { replace: true })}
+
           >
             <AddShoppingCartIcon />
           </IconButton>
