@@ -1,8 +1,20 @@
 import AxiosClient from "../../../config/AxiosClient";
-import { Combo } from "../models";
+import { BirdSpecies, Combo } from "../models";
 
 const comboApi = {
   fetch: (): Promise<Combo[]> => AxiosClient.get("/guest/Combos"),
+  getBird: (): Promise<BirdSpecies[]> => AxiosClient.get("/BirdSpecies"),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  create: (form: any) =>
+    AxiosClient.post(
+      "/staff/Combos",
+      form,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    ),
 };
 
 export default comboApi;

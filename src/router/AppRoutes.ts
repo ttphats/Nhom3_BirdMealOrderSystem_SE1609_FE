@@ -3,6 +3,8 @@ const AppRoutes = {
     combo: "/Combo",
     combodetails: "/ComboDetails",
     product: "/product",
+    createProduct: "/createProduct",
+    createCombo: "/createCombo",
     order: "/Order",
     orderdetails: "/OrderDetails",
     login: "/login",

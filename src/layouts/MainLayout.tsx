@@ -11,6 +11,8 @@ export default function MainLayout() {
         sx={{
           backgroundColor: "#f7f7f7",
           minHeight: "calc(100vh - 312px)",
+          display: 'flex',
+          justifyContent: 'center'
         }}
       >
         <Outlet />

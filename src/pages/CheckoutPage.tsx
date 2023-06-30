@@ -25,6 +25,7 @@ const defaultTheme = createTheme();
 const defaultAddressFormData: AddressFormData = {
   firstName: "",
   lastName: "",
+  phoneNum: "",
   address1: "",
   address2: "",
   city: "",

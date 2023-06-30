@@ -4,29 +4,42 @@ import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
+import CircleIcon from "@mui/icons-material/Circle";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { Box, LinearProgress, Typography } from "@mui/material";
+import { Box, Typography, styled } from "@mui/material";
 import { Product } from "./models";
+import { useAppSelector } from "../../redux/hooks";
 
 type Props = {
   item: Product;
   handleAddToCart: (clickedItem: Product) => void;
 };
 
-export default function ProductCard({
-  item,
-  handleAddToCart,
-}: Props) {
+const StyledInfo = styled("div")(({ theme }) => ({
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "flex-end",
+  marginTop: theme.spacing(1),
+  color: theme.palette.text.disabled,
+}));
+
+export default function ProductCard({ item, handleAddToCart }: Props) {
+  const user = useAppSelector((state) => state.profile.user.data);
   return (
     <Card
       sx={{
-        width: "260px",
+        width: "270px",
         height: "350px",
+        position: "relative",
         backgroundColor: "#272d40",
         borderRadius: 3,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
+        transition: "0.2s",
+        "&:hover": {
+          transform: "scale(1.1)",
+        },
       }}
     >
       <CardMedia
@@ -48,11 +61,9 @@ export default function ProductCard({
           position: "relative",
           transform: "translateY(-50%)",
           textOverflow: "ellipsis",
-          overflow: "hidden",
         }}
       >
         <Typography
-          noWrap
           gutterBottom
           variant="body1"
           component="div"
@@ -61,39 +72,93 @@ export default function ProductCard({
           {item.name}
         </Typography>
       </Box>
-      <CardContent sx={{ color: "#fff", textAlign: "left", p: 2, pt: 0 }}>
+      <CardContent
+        sx={{
+          color: "#fff",
+          textAlign: "left",
+          p: 0,
+          marginLeft: 2,
+          position: "relative",
+          bottom: "25px",
+        }}
+      >
         <Typography variant="body1" sx={{ color: "#69ec69", fontWeight: 700 }}>
           {item.price.toLocaleString("it-IT", {
             style: "currency",
             currency: "VND",
           })}
         </Typography>
-      </CardContent>
-      <Box sx={{ width: "90%", pl: 2, pr: 2 }}>
         <Typography variant="body2" sx={{ color: "#fff", textAlign: "left" }}>
-          Ordered quantity: 20/100
+          Unit In Stock: {item.unitInStock}
         </Typography>
-        <LinearProgress variant="determinate" value={20} />
-      </Box>
-      <CardActions
-        disableSpacing
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          bottom: 0,
-        }}
-      >
-        <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
-          <FavoriteIcon />
-        </IconButton>
-        <IconButton
-          aria-label="share"
-          sx={{ color: "#fff" }}
-          onClick={() => handleAddToCart(item)}
+        <Typography variant="body2" sx={{ color: "#fff", textAlign: "left" }}>
+          Expired Date: {item.expiredDate}
+        </Typography>
+      </CardContent>
+      {item.status == "Active" && user.role == "Staff" ? (
+        <StyledInfo sx={{ justifyContent: "flex-end", position: 'relative', bottom: '15px' }}>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon
+              sx={{ width: 16, height: 16, mr: 0.5, color: "lightgreen" }}
+            />
+            <Typography sx={{ color: "lightgreen" }} variant="caption">
+              Active
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
+      {item.status == "OutOfStock" && user.role == "Staff" ? (
+        <StyledInfo sx={{ justifyContent: "flex-end", position: 'relative', bottom: '15px' }}>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon sx={{ width: 16, height: 16, mr: 0.5, color: "red" }} />
+            <Typography sx={{ color: "red" }} variant="caption">
+              OutOfStock
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
+      {/* Customer Action Block */}
+      {user.role == "Customer" && (
+        <CardActions
+          disableSpacing
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            bottom: 0,
+          }}
         >
-          <AddShoppingCartIcon />
-        </IconButton>
-      </CardActions>
+          <IconButton aria-label="add to favorites" sx={{ color: "#fff" }}>
+            <FavoriteIcon />
+          </IconButton>
+          <IconButton
+            aria-label="share"
+            sx={{ color: "#fff" }}
+            onClick={() => handleAddToCart(item)}
+          >
+            <AddShoppingCartIcon />
+          </IconButton>
+        </CardActions>
+      )}
     </Card>
   );
 }

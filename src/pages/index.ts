@@ -6,7 +6,18 @@ import ProfilePage from "./ProfilePage";
 import RegisterPage from "./RegisterPage";
 import LoginPage from "./LoginPage";
 import CheckoutPage from "./CheckoutPage";
+import CreateProductPage from "./CreateProductPage";
+import CreateComboPage from "./CreateComboPage";
 
-
-
-export { ComboPage, ComboDetailsPage, OrderPage, OrderDetailsPage, ProfilePage, LoginPage, RegisterPage, CheckoutPage };
+export {
+  ComboPage,
+  ComboDetailsPage,
+  OrderPage,
+  OrderDetailsPage,
+  ProfilePage,
+  LoginPage,
+  RegisterPage,
+  CheckoutPage,
+  CreateProductPage,
+  CreateComboPage,
+};

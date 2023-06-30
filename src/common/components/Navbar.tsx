@@ -33,7 +33,7 @@ interface Props {
 }
 
 const drawerWidth = 240;
-const navItems = [
+let navItems = [
   {
     title: "Combo",
     path: AppRoutes.combo,
@@ -61,6 +61,47 @@ export default function Navbar({ window }: Props) {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
+  const user = useAppSelector((state) => state.profile.user.data);
+
+  console.log(user);
+
+  if (user.role == "Staff") {
+    navItems = [
+      {
+        title: "Combo",
+        path: AppRoutes.combo,
+      },
+      {
+        title: "Product",
+        path: AppRoutes.product,
+      },
+      {
+        title: "My Profile",
+        path: AppRoutes.profile,
+      },
+    ];
+  }
+
+  if (user.role == "Admin") {
+    navItems = [
+      {
+        title: "Dashboard",
+        path: AppRoutes.combo,
+      },
+      {
+        title: "Combo",
+        path: AppRoutes.combo,
+      },
+      {
+        title: "Product",
+        path: AppRoutes.product,
+      },
+      {
+        title: "My Profile",
+        path: AppRoutes.profile,
+      },
+    ];
+  }
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -81,7 +122,10 @@ export default function Navbar({ window }: Props) {
       <List>
         {navItems.map((item) => (
           <ListItem key={item.path} disablePadding>
-            <ListItemButton sx={{ textAlign: "center" }} onClick={() => routeChange(item.path)}>
+            <ListItemButton
+              sx={{ textAlign: "center" }}
+              onClick={() => routeChange(item.path)}
+            >
               <ListItemText primary={item.title} />
             </ListItemButton>
           </ListItem>
@@ -132,7 +176,8 @@ export default function Navbar({ window }: Props) {
     </Box>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
   const rootPath = `/${location.pathname.split("/")[1]}`;
 
   return (
@@ -171,14 +216,25 @@ export default function Navbar({ window }: Props) {
             sx={{ display: "flex", alignItems: "center", color: "#fff" }}
             component={RouterLink}
           >
-            <img src="https://cdn-icons-png.flaticon.com/512/3418/3418582.png" alt="BMOS Logo" width="48" height="48" />
-            <Typography variant="h6" component="div" display={{ xs: "none", md: "block" }}>
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3418/3418582.png"
+              alt="BMOS Logo"
+              width="48"
+              height="48"
+            />
+            <Typography
+              variant="h6"
+              component="div"
+              display={{ xs: "none", md: "block" }}
+            >
               BMOS
             </Typography>
           </Link>
 
           {/* Desktop navbar */}
-          <Box sx={{ display: { xs: "none", md: "block", height: "4rem", p: 0 } }}>
+          <Box
+            sx={{ display: { xs: "none", md: "block", height: "4rem", p: 0 } }}
+          >
             {navItems.map((item) => (
               <Button
                 key={item.path}
@@ -225,7 +281,14 @@ export default function Navbar({ window }: Props) {
             }}
           >
             {auth.isAuthenticated ? (
-              <Box sx={{ m: 1, display: "flex", alignItems: "center", cursor: "pointer" }}>
+              <Box
+                sx={{
+                  m: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+              >
                 <AccountMenu />
               </Box>
             ) : (

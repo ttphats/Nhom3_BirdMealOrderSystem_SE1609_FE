@@ -17,7 +17,6 @@ import {
 import { toast } from "react-toastify";
 
 import { useAppSelector } from "../redux/hooks";
-import AppRoutes from "../router/AppRoutes";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,7 +55,6 @@ export default function ProfilePage() {
   const auth = useAppSelector((state) => state.auth);
   const profile = useAppSelector((state) => state.profile.user);
   const [value, setValue] = useState(0);
-  console.log(profile);
 
   const handleChangeTab = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -96,6 +94,9 @@ export default function ProfilePage() {
                       </Typography>
                       <Typography variant="subtitle2">
                         <strong>Email:</strong> {profile.data.email}
+                      </Typography>
+                      <Typography variant="subtitle2">
+                        <strong>Role:</strong> {profile.data.role}
                       </Typography>
                     </Stack>
                   </Grid>

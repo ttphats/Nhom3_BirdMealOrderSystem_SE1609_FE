@@ -1,3 +1,4 @@
-import type { Product } from "./Product";
+import ProductCard from "./ProductCard";
 
-export { Product };
+
+export { ProductCard };

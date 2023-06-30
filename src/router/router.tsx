@@ -10,6 +10,8 @@ import {
   ProfilePage,
   RegisterPage,
   CheckoutPage,
+  CreateProductPage,
+  CreateComboPage,
 } from "../pages";
 import AppRoutes from "./AppRoutes";
 import ProductPage from "../pages/ProductPage";
@@ -50,6 +52,14 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.checkout,
         element: <CheckoutPage />,
+      },
+      {
+        path: AppRoutes.createProduct,
+        element: <CreateProductPage />,
+      },
+      {
+        path: AppRoutes.createCombo,
+        element: <CreateComboPage />,
       },
     ],
   },
