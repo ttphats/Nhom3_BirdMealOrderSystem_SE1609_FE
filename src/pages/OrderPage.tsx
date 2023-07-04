@@ -1,4 +1,4 @@
-import { Button, Paper } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import orderApi from "../modules/Order/apis/ordedrApi";
@@ -30,7 +30,54 @@ export default function OrderPage() {
     { field: "shipDate", headerName: "Ship Date", width: 150 },
     { field: "paymentDate", headerName: "Payment Date", width: 150 },
     { field: "totalAmount", headerName: "Total Amount", width: 150 },
-    { field: "status", headerName: "Status", width: 100 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 100,
+      renderCell: (params: GridCellParams) => {
+        const status = params.row.status;
+        return (
+          <>
+            {status === "Cancelled" && (
+              <Box
+                sx={{
+                  width: '80px',
+                  borderRadius: "8px",
+                  backgroundColor: "#FF5733",
+                  color: "#fff",
+                }}
+              >
+                Cancelled
+              </Box>
+            )}
+            {status === "Processing" && (
+              <Box
+                sx={{
+                  width: '80px',
+                  borderRadius: "8px",
+                  backgroundColor: "#FFC300 ",
+                  color: "#fff",
+                }}
+              >
+                Processing
+              </Box>
+            )}
+            {status === "Completed" && (
+              <Box
+                sx={{
+                  width: '80px',
+                  borderRadius: "8px",
+                  backgroundColor: "#009E60",
+                  color: "#fff",
+                }}
+              >
+                Completed
+              </Box>
+            )}
+          </>
+        );
+      },
+    },
     {
       field: "action",
       headerName: "Action",
