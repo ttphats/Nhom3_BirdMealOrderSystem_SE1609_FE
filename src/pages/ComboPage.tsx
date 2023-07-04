@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Badge,
+  Box,
   Button,
   Container,
   Drawer,
@@ -9,18 +10,19 @@ import {
   InputAdornment,
   MenuItem,
   OutlinedInput,
+  Pagination,
   Stack,
   TextField,
   Typography,
   styled,
 } from "@mui/material";
-import { AddShoppingCart } from "@mui/icons-material";
+import { AddShoppingCart, Search as SearchIcon } from "@mui/icons-material";
 import { Cart } from "../modules/Cart";
 import { ComboCard } from "../modules/Combo";
 import { CartItemType } from "../modules/Cart/CartItemType";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { Combo } from "../modules/Combo/models";
+import { BirdSpecies, Combo } from "../modules/Combo/models";
 import comboApi from "../modules/Combo/apis/comboApi";
 import {
   addToCart,
@@ -31,7 +33,6 @@ import { useAppSelector } from "../redux/hooks";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AppRoutes from "../router/AppRoutes";
 import { useNavigate } from "react-router-dom";
-import SearchIcon from "@mui/icons-material/Search";
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -62,26 +63,44 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 }));
 
 const SORT_OPTIONS = [
-  { name: "Mới nhất", value: "desc", label: "Mới nhất" },
+  { name: "Mới nhất", value: "true", label: "Mới nhất" },
   { value: "", label: "Phổ biến" },
-  { name: "Cũ nhất", value: "asc", label: "Cũ nhất" },
+  { name: "Cũ nhất", value: "false", label: "Cũ nhất" },
 ];
 
 export default function ComboPage() {
   const [cartOpen, setCartOpen] = useState(false);
   const [combos, setCombos] = useState<Combo[]>([]);
+  const [bird, setBirds] = useState<BirdSpecies[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Combo[]>([]);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const user = useAppSelector((state) => state.profile.user.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [sortOption, setSortOption] = useState<string>("true");
+  const [selectedBirdId, setSelectedBirdId] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(12);
 
   const routeChange = (path: string) => {
     navigate(path, { replace: true });
   };
 
-  const fetchListCombo = () => {
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
+    setCurrentPage(page);
+  };
+
+  const fetchListCombo = (
+    sortOption: string,
+    birdId: string,
+    currentPage: number
+  ) => {
     comboApi
-      .fetch()
+      .fetch(sortOption, birdId, currentPage)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((response: any) => {
         const combos = response.data;
@@ -90,9 +109,16 @@ export default function ComboPage() {
       .catch((err) => console.log(err));
   };
 
-  useEffect(() => {
-    fetchListCombo();
-  }, []);
+  const fetchListBird = () => {
+    comboApi
+      .getBird()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((response: any) => {
+        const b = response.data;
+        setBirds(b);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const getTotalItems = (items: CartItemType[]): number => {
     return items.reduce(
@@ -101,6 +127,7 @@ export default function ComboPage() {
       0
     );
   };
+
   const handleAddToCart = (item: Combo) => {
     const existingCartItemIndex: number = cartItems.findIndex(
       (cartItem) => cartItem.combo?.id === item.id
@@ -114,7 +141,7 @@ export default function ComboPage() {
           (updatedCartItems[existingCartItemIndex].comboQuantity ?? 0) + 1,
       };
       const quantity =
-        updatedCartItems[existingCartItemIndex].comboQuantity || 0; // Handle undefined case
+        updatedCartItems[existingCartItemIndex].comboQuantity || 0;
       dispatch(
         updateCartItemQuantity({
           item: updatedCartItems[existingCartItemIndex],
@@ -144,9 +171,52 @@ export default function ComboPage() {
 
     dispatch(updateCartItemQuantity(updatedItem));
   };
+
   const handleRemoveItem = (item: CartItemType) => {
     dispatch(removeCartItem(item));
   };
+
+  const performSearch = (query: string) => {
+    comboApi
+      .search(query)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((response: any) => {
+        const combos = response.data;
+        setSearchResults(combos);
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        console.error("Error searching combos:", error);
+      });
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sortOption = event.target.value;
+    setSortOption(sortOption);
+    const birdIdParam = selectedBirdId == 0 ? "" : String(selectedBirdId);
+    fetchListCombo(sortOption, birdIdParam, currentPage);
+  };
+
+  const handleSearchInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    performSearch(query);
+  };
+
+  const handleBirdChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const birdId = event.target.value as number;
+    setSelectedBirdId(birdId);
+    const birdIdParam = birdId == 0 ? "" : String(birdId);
+    fetchListCombo(sortOption, birdIdParam, currentPage);
+  };
+
+  useEffect(() => {
+    const birdIdParam = selectedBirdId == 0 ? "" : String(selectedBirdId);
+    fetchListCombo(sortOption, birdIdParam, currentPage);
+    fetchListBird();
+  }, []);
 
   return (
     <>
@@ -157,7 +227,7 @@ export default function ComboPage() {
           updateCartItemQuantity={handleUpdateQuantity}
         />
       </Drawer>
-      {user.role == "Customer" && (
+      {user.role === "Customer" && (
         <StyledButton onClick={() => setCartOpen(true)}>
           <Badge badgeContent={getTotalItems(cartItems)} color="error">
             <AddShoppingCart />
@@ -176,7 +246,7 @@ export default function ComboPage() {
             All combos
           </Typography>
 
-          {user.role == "Staff" ? (
+          {user.role === "Staff" && (
             <Button
               sx={{
                 "&:hover": {
@@ -190,8 +260,6 @@ export default function ComboPage() {
             >
               Add combo
             </Button>
-          ) : (
-            <></>
           )}
         </Stack>
 
@@ -202,30 +270,72 @@ export default function ComboPage() {
           justifyContent="space-between"
         >
           <StyledSearch
-            placeholder="Search product..."
+            placeholder="Search combo..."
+            value={searchQuery}
+            onChange={handleSearchInputChange}
             startAdornment={
               <InputAdornment position="start">
-                <SearchIcon
-                  sx={{ color: "text.disabled", width: 20, height: 20 }}
-                />
+                <SearchIcon />
               </InputAdornment>
             }
           />
-          <TextField select size="small">
-            {SORT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Box>
+            <TextField
+              select
+              size="small"
+              value={selectedBirdId}
+              onChange={handleBirdChange}
+              sx={{ mr: 2 }}
+            >
+              <MenuItem value={0}>Sort by bird</MenuItem>
+              {bird.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              size="small"
+              value={sortOption}
+              onChange={handleSortChange}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  defaultValue={"true"}
+                  value={option.value}
+                >
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
         </Stack>
         <Grid container spacing={3}>
-          {combos?.map((item) => (
-            <Grid key={item.id} item xs={12} md={3}>
-              <ComboCard item={item} handleAddToCart={handleAddToCart} />
-            </Grid>
-          ))}
+          {searchResults.length > 0
+            ? searchResults.map((item) => (
+                <Grid key={item.id} item xs={12} md={3}>
+                  <ComboCard item={item} handleAddToCart={handleAddToCart} />
+                </Grid>
+              ))
+            : combos.map((item) => (
+                <Grid key={item.id} item xs={12} md={3}>
+                  <ComboCard item={item} handleAddToCart={handleAddToCart} />
+                </Grid>
+              ))}
         </Grid>
+        <Pagination
+          count={Math.ceil(combos.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        />
       </Container>
     </>
   );

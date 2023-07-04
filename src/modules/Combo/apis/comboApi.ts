@@ -2,7 +2,8 @@ import AxiosClient from "../../../config/AxiosClient";
 import { BirdSpecies, Combo } from "../models";
 
 const comboApi = {
-  fetch: (): Promise<Combo[]> => AxiosClient.get("/guest/Combos"),
+  fetch: (sortOption: string, idBird: string, page: number): Promise<Combo[]> =>
+    AxiosClient.get(`/guest/Combos?descending=${sortOption}&idBird=${idBird}&page=${page}`),
   getBird: (): Promise<BirdSpecies[]> => AxiosClient.get("/BirdSpecies"),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   create: (form: any) =>
@@ -11,7 +12,10 @@ const comboApi = {
         "Content-Type": "multipart/form-data",
       },
     }),
-  getDetails: (id: number) : Promise<Combo>  => AxiosClient.get(`/guest/Combos/detail/${id}`),
+  getDetails: (id: number): Promise<Combo> =>
+    AxiosClient.get(`/guest/Combos/detail/${id}`),
+  search: (query: string): Promise<Combo[]> =>
+    AxiosClient.get(`/guest/Combos?name=${query}`),
 };
 
 export default comboApi;
