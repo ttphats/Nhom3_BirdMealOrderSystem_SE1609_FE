@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Badge,
+  Box,
   Button,
   Container,
   Drawer,
@@ -9,6 +10,7 @@ import {
   InputAdornment,
   MenuItem,
   OutlinedInput,
+  Pagination,
   Stack,
   TextField,
   Typography,
@@ -62,9 +64,9 @@ const StyledSearch = styled(OutlinedInput)(({ theme }) => ({
 }));
 
 const SORT_OPTIONS = [
-  { name: "Mới nhất", value: "desc", label: "Mới nhất" },
+  { name: "Mới nhất", value: "true", label: "Mới nhất" },
   { value: "", label: "Phổ biến" },
-  { name: "Cũ nhất", value: "asc", label: "Cũ nhất" },
+  { name: "Cũ nhất", value: "false", label: "Cũ nhất" },
 ];
 
 export default function ProductPage() {
@@ -74,26 +76,43 @@ export default function ProductPage() {
   const user = useAppSelector((state) => state.profile.user.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [sortOption, setSortOption] = useState<string>("true");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(4);
+  const [totalPages, setTotalPages] = useState(1);
 
   const routeChange = (path: string) => {
     navigate(path, { replace: true });
   };
 
-  const fetchListProduct = () => {
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      fetchListProduct(sortOption, page);
+    }
+  };
+
+  const fetchListProduct = (sortOption: string, page: number) => {
     productApi
-      .fetch()
+      .fetch(sortOption, page, itemsPerPage)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((response: any) => {
-        const products = response.data;
+        const { data, pagination } = response;
+        const { totalPages } = pagination;
         console.log(products);
-        setProducts(products);
+        setProducts(data);
+        setCurrentPage(page);
+        setTotalPages(totalPages);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    fetchListProduct();
-  }, []);
+    fetchListProduct(sortOption, currentPage);
+  }, [currentPage]);
 
   const getTotalItems = (items: CartItemType[]): number => {
     return items.reduce(
@@ -140,6 +159,12 @@ export default function ProductPage() {
   };
   const handleRemoveItem = (item: CartItemType) => {
     dispatch(removeCartItem(item));
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sortOption = event.target.value;
+    setSortOption(sortOption);
+    fetchListProduct(sortOption, currentPage);
   };
 
   return (
@@ -205,13 +230,24 @@ export default function ProductPage() {
               </InputAdornment>
             }
           />
-          <TextField select size="small">
-            {SORT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Box>
+            <TextField
+              select
+              size="small"
+              value={sortOption}
+              onChange={handleSortChange}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  defaultValue={"true"}
+                  value={option.value}
+                >
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
         </Stack>
         <Grid container spacing={3}>
           {products?.map((item) => (
@@ -220,6 +256,17 @@ export default function ProductPage() {
             </Grid>
           ))}
         </Grid>
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        />
       </Container>
     </>
   );

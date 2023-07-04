@@ -56,19 +56,31 @@ export default function Login() {
 
   const onSubmitHandler: SubmitHandler<logininput> = (values) => {
     authApi
-          .login({
-            email: values.email.trim().toLowerCase(),
-            password: values.password,
-          })
-          .then((response) => {
-            dispatch(login(response.data.accessToken));
-            dispatch(fetchUserProfile());
-            navigate(AppRoutes.home);
+      .login({
+        email: values.email.trim().toLowerCase(),
+        password: values.password,
+      })
+      .then((response) => {
+        const accessToken = response.data.accessToken;
+        dispatch(login(accessToken));
+        dispatch(fetchUserProfile())
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((profileResponse: any) => {
+            const isAdmin = profileResponse.data.role === "Admin";
+            if (isAdmin) {
+              navigate(AppRoutes.dashboard);
+            } else {
+              navigate(AppRoutes.home);
+            }
             toast.success("Đăng nhập thành công");
           })
           .catch(() => {
-            toast.error("Email hoặc mật khẩu không chính xác.");
+            toast.error("Failed to fetch user profile.");
           });
+      })
+      .catch(() => {
+        toast.error("Email hoặc mật khẩu không chính xác.");
+      });
     console.log(values);
   };
   console.log(errors);
@@ -156,7 +168,11 @@ export default function Login() {
               </Link>
             </Grid>
             <Grid item>
-              <Link variant="body2" sx={{ m: 2 , cursor: "pointer"}} onClick={() => routeChange(AppRoutes.register)}>
+              <Link
+                variant="body2"
+                sx={{ m: 2, cursor: "pointer" }}
+                onClick={() => routeChange(AppRoutes.register)}
+              >
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

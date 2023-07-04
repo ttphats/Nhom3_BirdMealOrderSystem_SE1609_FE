@@ -7,6 +7,7 @@ import {
   IconButton,
   Paper,
   Stack,
+  TextField,
   Typography,
   styled,
 } from "@mui/material";
@@ -28,12 +29,16 @@ import { Cart } from "../modules/Cart";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import {
   addToCart,
   removeCartItem,
   updateCartItemQuantity,
 } from "../redux/slices/cartSlice";
+import feedbackApi from "../modules/Feedback/apis/feedbackApi";
+import { Feedback } from "../modules/Feedback/models";
+import { toast } from "react-toastify";
+import SendIcon from '@mui/icons-material/Send';
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -55,6 +60,45 @@ const ComboDetailsPage = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
+  const [feedback, setFeedback] = useState("");
+  const [feedbackData, setFeedbackData] = useState<Feedback[]>([]);
+
+  const fetchFeedbackData = () => {
+    if (combo) {
+      feedbackApi
+        .fetch(combo?.id, 1)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          console.log(response.data);
+          setFeedbackData(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching feedback:", error);
+        });
+    }
+  };
+
+  const submitFeedback = () => {
+    if (combo) {
+      const formData = {
+        itemId: combo.id,
+        itemType: 1,
+        content: feedback,
+      };
+      if (feedback) {
+        feedbackApi
+          .send(formData)
+          .then(() => {
+            toast.success("Comment Successfully");
+            fetchFeedbackData();
+          })
+          .catch((error) => {
+            toast.error(error?.response?.data)
+            console.error("Error submitting feedback:", error);
+          });
+      }
+    }
+  };
 
   const productNames =
     combo?.products?.map((product: Product) => product.name) ?? [];
@@ -106,6 +150,10 @@ const ComboDetailsPage = () => {
   useEffect(() => {
     fetchComboDetails();
   }, []);
+
+  useEffect(() => {
+    fetchFeedbackData();
+  }, [feedback, combo]);
 
   const getTotalItems = (items: CartItemType[]): number => {
     return items.reduce(
@@ -229,7 +277,11 @@ const ComboDetailsPage = () => {
             )}
             {user.role == "Staff" && (
               <Stack direction="row" spacing={2} sx={{ m: 2, ml: 0 }}>
-                <Button variant="outlined" startIcon={<DeleteForeverIcon />} color="error">
+                <Button
+                  variant="outlined"
+                  startIcon={<DeleteForeverIcon />}
+                  color="error"
+                >
                   Delete
                 </Button>
                 <Button
@@ -287,170 +339,185 @@ const ComboDetailsPage = () => {
               src="/static/images/avatar/1.jpg"
               sx={{ ml: 2 }}
             />
-            <Typography
-              variant="h5"
-              sx={{ color: "#ccc", fontWeight: 600, fontSize: "14px", ml: 2 }}
-            >
-              Add your feedback here.
-            </Typography>
+            <TextField
+              label="Add your feedback here"
+              variant="outlined"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              sx={{ flex: 1, ml: 2, mr: 2 }}
+            />
+            <Button variant="contained" onClick={submitFeedback} startIcon={<SendIcon />}>
+              Send
+            </Button>
           </Paper>
-          <Paper sx={{ width: "90%", m: "auto", mt: 4 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-start",
-                alignItems: "center",
-              }}
+          {feedbackData.map((feedbackItem) => (
+            <Paper
+              key={feedbackItem.id}
+              sx={{ width: "90%", m: "auto", mt: 4 }}
             >
-              <Avatar alt="User Avatar" sx={{ ml: 2 }} />
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "flex-start",
-                  ml: 1,
+                  justifyContent: "flex-start",
+                  alignItems: "center",
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{ fontSize: "20px", fontWeight: 700, color: "#363636" }}
-                >
-                  Name
-                </Typography>
+                <Avatar alt="User Avatar" sx={{ ml: 2 }} />
                 <Box
                   sx={{
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "flex-start",
+                    ml: 1,
                   }}
                 >
+                  <Typography
+                    variant="h6"
+                    sx={{ fontSize: "20px", fontWeight: 700, color: "#363636" }}
+                  >
+                    {feedbackItem?.customer?.email}
+                  </Typography>
                   <Box
                     sx={{
-                      border: 1,
-                      borderColor: "orange",
-                      minWidth: "80px",
-                      borderRadius: 1,
-                      height: "18px",
                       display: "flex",
                       justifyContent: "center",
-                      alignItems: "center",
+                      alignItems: "flex-start",
                     }}
                   >
-                    <Typography
-                      variant="body2"
+                    <Box
                       sx={{
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        color: "orange",
+                        border: 1,
+                        borderColor: "orange",
+                        minWidth: "80px",
+                        borderRadius: 1,
+                        height: "18px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
                       }}
                     >
-                      role
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      border: 1,
-                      borderColor: "#ccc",
-                      minWidth: "80px",
-                      borderRadius: 1,
-                      height: "18px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      ml: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "12px", fontWeight: 700, color: "#ccc" }}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          color: "orange",
+                        }}
+                      >
+                        customer
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        border: 1,
+                        borderColor: "#ccc",
+                        minWidth: "80px",
+                        borderRadius: 1,
+                        height: "18px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        ml: 1,
+                      }}
                     >
-                      11/11/2001
-                    </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "12px",
+                          fontWeight: 700,
+                          color: "#ccc",
+                        }}
+                      >
+                       {feedbackItem?.createdDate && new Date(feedbackItem.createdDate).toLocaleTimeString("vi-VN")}
+                        &nbsp;
+                       {feedbackItem?.createdDate && new Date(feedbackItem.createdDate).toLocaleDateString("vi-VN")}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </Box>
-            </Box>
-            <Typography
-              variant="h5"
-              sx={{
-                fontSize: "20px",
-                fontWeight: 700,
-                color: "#363636",
-                p: 2,
-                textAlign: "left",
-              }}
-            >
-              content
-            </Typography>
-            <Box
-              sx={{
-                borderTop: 1,
-                borderTopColor: "#ccc",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              <Box
+              <Typography
+                variant="h5"
                 sx={{
+                  fontSize: "20px",
                   fontWeight: 700,
                   color: "#363636",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 1.5,
+                  p: 2,
+                  textAlign: "left",
                 }}
               >
-                <FavoriteIcon sx={{ fontSize: "15px" }} />
-
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "10px", ml: "5px" }}
-                >
-                  Yêu thích
-                </Typography>
-              </Box>
+                {feedbackItem?.content}
+              </Typography>
               <Box
                 sx={{
-                  fontWeight: 700,
-                  color: "#363636",
+                  borderTop: 1,
+                  borderTopColor: "#ccc",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  p: 1.5,
+                  justifyContent: "flex-start",
                 }}
               >
-                <ChatBubbleIcon sx={{ fontSize: "15px" }} />
-
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "10px", ml: "5px" }}
+                <Box
+                  sx={{
+                    fontWeight: 700,
+                    color: "#363636",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 1.5,
+                  }}
                 >
-                  Reply
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  fontWeight: 700,
-                  color: "#363636",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 1.5,
-                }}
-              >
-                <ReportProblemIcon sx={{ fontSize: "15px" }} />
+                  <FavoriteIcon sx={{ fontSize: "15px" }} />
 
-                <Typography
-                  variant="body2"
-                  sx={{ fontSize: "10px", ml: "5px" }}
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "10px", ml: "5px" }}
+                  >
+                    Yêu thích
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    fontWeight: 700,
+                    color: "#363636",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 1.5,
+                  }}
                 >
-                  Báo cáo
-                </Typography>
+                  <ChatBubbleIcon sx={{ fontSize: "15px" }} />
+
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "10px", ml: "5px" }}
+                  >
+                    Reply
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    fontWeight: 700,
+                    color: "#363636",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 1.5,
+                  }}
+                >
+                  <ReportProblemIcon sx={{ fontSize: "15px" }} />
+
+                  <Typography
+                    variant="body2"
+                    sx={{ fontSize: "10px", ml: "5px" }}
+                  >
+                    Báo cáo
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          </Paper>
+            </Paper>
+          ))}
         </Box>
       </Stack>
     </>

@@ -81,7 +81,8 @@ export default function ComboPage() {
   const [sortOption, setSortOption] = useState<string>("true");
   const [selectedBirdId, setSelectedBirdId] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(4);
+  const [totalPages, setTotalPages] = useState(1);
 
   const routeChange = (path: string) => {
     navigate(path, { replace: true });
@@ -91,20 +92,22 @@ export default function ComboPage() {
     _event: React.ChangeEvent<unknown>,
     page: number
   ) => {
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      const birdIdParam = selectedBirdId == 0 ? "" : String(selectedBirdId);
+      fetchListCombo(sortOption, birdIdParam, page);
+    }
   };
-
-  const fetchListCombo = (
-    sortOption: string,
-    birdId: string,
-    currentPage: number
-  ) => {
+  const fetchListCombo = (sortOption: string, birdId: string, page: number) => {
     comboApi
-      .fetch(sortOption, birdId, currentPage)
+      .fetch(sortOption, birdId, page, itemsPerPage)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((response: any) => {
-        const combos = response.data;
-        setCombos(combos);
+        const { data, pagination } = response;
+        const { totalPages } = pagination;
+        setCombos(data);
+        setCurrentPage(page);
+        setTotalPages(totalPages);
       })
       .catch((err) => console.log(err));
   };
@@ -326,7 +329,7 @@ export default function ComboPage() {
               ))}
         </Grid>
         <Pagination
-          count={Math.ceil(combos.length / itemsPerPage)}
+          count={totalPages}
           page={currentPage}
           onChange={handlePageChange}
           color="primary"

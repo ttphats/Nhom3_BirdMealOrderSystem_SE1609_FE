@@ -73,18 +73,32 @@ export default function Review({
   };
 
   const handleConfirmClick = () => {
+    const items: CartItemType[] = cartItems.map((item: CartItemType) => {
+      if (item.product) {
+        return {
+          product: item.product,
+          productQuantity: item.productQuantity,
+        };
+      } else if (item.combo) {
+        return {
+          combo: item.combo,
+          comboQuantity: item.comboQuantity,
+        };
+      }
+      throw new Error("Invalid item");
+    });
+  
     checkOutApi
-      .order(address, formData.phoneNum, cartItems)
+      .order(address, formData.phoneNum, items)
       .then(() => {
         toast.success("Order successfully");
         dispatch(clearCart());
         navigate(AppRoutes.home);
       })
       .catch(() => {
-        toast.error("Something wrong, check again!");
+        toast.error("Something went wrong. Please try again!");
       });
   };
-
   return (
     <Fragment>
       <Typography variant="h6" gutterBottom>

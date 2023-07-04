@@ -88,7 +88,7 @@ export default function ManageOrderPage() {
         const handleCancel = () => {
           const orderId = params.row.id as number;
           orderApi
-            .cancelOrder(orderId)
+            .staffCancelOrder(orderId)
             .then(() => {
               updateOrderStatus(orderId, "Cancelled");
             })
@@ -202,15 +202,15 @@ export default function ManageOrderPage() {
         const data = response.data;
         const orders = data.map((order: Order) => ({
           id: `${order.id}`,
-          customerName: `${order.customer.name}`,
+          customerName: `${order.customer?.fullName}`,
           orderDate: `${order.orderDate}`,
           shipAddress: `${order.shipAddress}`,
           shipPhone: `${order.shipPhone}`,
-          shippedBy: `${order.shippedBy}`,
-          shipDate: `${order.shipDate}`,
-          paymentDate: `${order.paymentDate}`,
-          totalAmount: `${order.totalAmount}`,
-          status: `${order.status}`,
+          shippedBy: `${order.shippedBy?.fullName || "N/A"}`,
+          shipDate: `${order.shipDate || 'N/A'}`,
+          paymentDate: `${order.paymentDate || "N/A"}`,
+          totalAmount: `${order.totalAmount|| "N/A"}`,
+          status: `${order.status || "N/A"}`,
         }));
         setOrderData(orders);
       })

@@ -8,7 +8,7 @@ import { Button } from "@mui/material";
 import { useAppSelector } from "../../redux/hooks";
 
 export interface AddressFormData {
-  addressOption: "logged" | "fill"; // Add addressOption property
+  addressOption: "logged" | "fill"; 
   phoneNum: string;
   address: string;
   ward: string;
