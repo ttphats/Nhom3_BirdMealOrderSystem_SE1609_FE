@@ -12,9 +12,11 @@ import {
   CheckoutPage,
   CreateProductPage,
   CreateComboPage,
+  ManageOrderPage,
 } from "../pages";
 import AppRoutes from "./AppRoutes";
 import ProductPage from "../pages/ProductPage";
+import ProductDetailsPage from "../pages/ProductDetailsPage";
 
 const routes: RouteObject[] = [
   {
@@ -60,6 +62,18 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.createCombo,
         element: <CreateComboPage />,
+      },
+      {
+        path: AppRoutes.combodetails,
+        element: <ComboDetailsPage />,
+      },
+      {
+        path: AppRoutes.productdetails,
+        element: <ProductDetailsPage />,
+      },
+      {
+        path: AppRoutes.manageOrders,
+        element: <ManageOrderPage />,
       },
     ],
   },

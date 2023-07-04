@@ -79,7 +79,7 @@ export default function ComboPage() {
     navigate(path, { replace: true });
   };
 
-  const fetchListConbo = () => {
+  const fetchListCombo = () => {
     comboApi
       .fetch()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,7 +91,7 @@ export default function ComboPage() {
   };
 
   useEffect(() => {
-    fetchListConbo();
+    fetchListCombo();
   }, []);
 
   const getTotalItems = (items: CartItemType[]): number => {

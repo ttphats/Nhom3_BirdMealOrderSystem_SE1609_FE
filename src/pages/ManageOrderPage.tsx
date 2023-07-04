@@ -3,7 +3,7 @@ import { DataGrid, GridCellParams, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import orderApi from "../modules/Order/apis/ordedrApi";
 import { Order } from "../modules/Order/models";
-export default function OrderPage() {
+export default function ManageOrderPage() {
   const [orderData, setOrderData] = useState<Order[]>([]);
 
   const columns: GridColDef[] = [

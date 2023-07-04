@@ -14,6 +14,9 @@ import { CartItemType } from "../Cart/CartItemType";
 import checkOutApi from "./apis/checkOutApi";
 import { toast } from "react-toastify";
 import AppRoutes from "../../router/AppRoutes";
+import { clearCart } from "../../redux/slices/cartSlice";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "../../redux/hooks";
 
 interface PaymentFormProps {
   formData: AddressFormData;
@@ -29,17 +32,14 @@ export default function Review({
   const location = useLocation();
   const cartItems = location.state;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useAppSelector((state) => state.profile.user.data);
 
-  const address =
-    formData.address1 +
-    ", " +
-    formData.address2 +
-    ", " +
-    formData.city +
-    ", " +
-    formData.state +
-    ", " +
-    formData.country;
+  const address = `${formData.address}${
+    formData.ward ? `, ${formData.ward}` : ""
+  }${formData.city ? `, ${formData.city}` : ""}${
+    formData.country ? `, ${formData.country}` : ""
+  }`;
 
   const payments = [
     { name: "Card type", detail: "Visa" },
@@ -77,6 +77,7 @@ export default function Review({
       .order(address, formData.phoneNum, cartItems)
       .then(() => {
         toast.success("Order successfully");
+        dispatch(clearCart());
         navigate(AppRoutes.home);
       })
       .catch(() => {
@@ -123,13 +124,8 @@ export default function Review({
           <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
             Shipping
           </Typography>
-          <Typography gutterBottom>
-            {formData.firstName} {formData.lastName}
-          </Typography>
-          <Typography gutterBottom>
-            {formData.address1}, {formData.address2}, {formData.city},{" "}
-            {formData.state}, {formData.zip}, {formData.country}{" "}
-          </Typography>
+          <Typography gutterBottom>{user.fullname}</Typography>
+          <Typography gutterBottom>{address}</Typography>
         </Grid>
         <Grid item container direction="column" xs={12} sm={6}>
           <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>

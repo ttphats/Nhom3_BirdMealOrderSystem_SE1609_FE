@@ -17,23 +17,22 @@ import AppRoutes from "../router/AppRoutes";
 import StarIcon from "@mui/icons-material/Star";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
-import { BirdSpecies, Combo } from "../modules/Combo/models";
 import { useEffect, useState } from "react";
-import comboApi from "../modules/Combo/apis/comboApi";
 import { Product } from "../modules/Product/models";
-import { AddShoppingCart } from "@mui/icons-material";
+import productApi from "../modules/Product/apis/productApi";
 import { useAppSelector } from "../redux/hooks";
-import { CartItemType } from "../modules/Cart/CartItemType";
-import { Cart } from "../modules/Cart";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { CartItemType } from "../modules/Cart/CartItemType";
 import {
   addToCart,
   removeCartItem,
   updateCartItemQuantity,
 } from "../redux/slices/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { AddShoppingCart } from "@mui/icons-material";
+import { Cart } from "../modules/Cart";
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -47,64 +46,31 @@ const StyledButton = styled(IconButton)`
   top: 100px;
 `;
 
-const ComboDetailsPage = () => {
+export default function ProductDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [combo, setCombo] = useState<Combo>();
+  const [product, setProduct] = useState<Product>();
   const user = useAppSelector((state) => state.profile.user.data);
-  const [cartOpen, setCartOpen] = useState(false);
-  const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const [cartOpen, setCartOpen] = useState(false);
 
-  const productNames =
-    combo?.products?.map((product: Product) => product.name) ?? [];
-  const concatenatedNames = productNames.join(", ");
-
-  const birdName =
-    combo?.birdSpecies?.map((bird: BirdSpecies) => bird.name) ?? [];
-  const concatenatedNamesBird = birdName.join(", ");
-
-  const fetchComboDetails = () => {
+  const fetchProductDetails = () => {
     if (typeof id === "string") {
-      const comboId = parseInt(id, 10); // Convert id to number
-      comboApi
-        .getDetails(comboId)
+      const productId = parseInt(id, 10);
+      productApi
+        .getDetails(productId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((response: any) => {
-          const combo = response.data;
-          setCombo(combo);
+          const product = response.data;
+          setProduct(product);
         })
         .catch((err) => console.log(err));
     }
   };
 
-  const handleAddToCart = (item: Combo) => {
-    const existingCartItemIndex: number = cartItems.findIndex(
-      (cartItem) => cartItem.combo?.id === item.id
-    );
-
-    if (existingCartItemIndex !== -1) {
-      const updatedCartItems = [...cartItems];
-      updatedCartItems[existingCartItemIndex] = {
-        ...updatedCartItems[existingCartItemIndex],
-        comboQuantity:
-          (updatedCartItems[existingCartItemIndex].comboQuantity ?? 0) + 1,
-      };
-      const quantity =
-        updatedCartItems[existingCartItemIndex].comboQuantity || 0; // Handle undefined case
-      dispatch(
-        updateCartItemQuantity({
-          item: updatedCartItems[existingCartItemIndex],
-          quantity,
-          isProduct: false,
-        })
-      );
-    } else {
-      dispatch(addToCart({ combo: item, comboQuantity: 1 }));
-    }
-  };
-
   useEffect(() => {
-    fetchComboDetails();
+    fetchProductDetails();
   }, []);
 
   const getTotalItems = (items: CartItemType[]): number => {
@@ -114,6 +80,25 @@ const ComboDetailsPage = () => {
       0
     );
   };
+  const handleAddToCart = (item: Product) => {
+    const existingCartItem = cartItems.find(
+      (cartItem) => cartItem.product?.id === item.id
+    );
+
+    if (existingCartItem) {
+      const updatedQuantity = (existingCartItem.productQuantity ?? 0) + 1;
+      dispatch(
+        updateCartItemQuantity({
+          item: existingCartItem,
+          quantity: updatedQuantity,
+          isProduct: true,
+        })
+      );
+    } else {
+      dispatch(addToCart({ product: item, productQuantity: 1 }));
+    }
+  };
+
   const handleUpdateQuantity = (
     item: CartItemType,
     quantity: number,
@@ -134,6 +119,7 @@ const ComboDetailsPage = () => {
   const handleRemoveItem = (item: CartItemType) => {
     dispatch(removeCartItem(item));
   };
+
   return (
     <>
       <Drawer anchor="right" open={cartOpen} onClose={() => setCartOpen(false)}>
@@ -160,7 +146,7 @@ const ComboDetailsPage = () => {
               p: 3,
             }}
             alt="The house from the offer."
-            src={combo?.imgUrl}
+            src={product?.imgUrl}
           />
           <Box
             sx={{
@@ -173,7 +159,7 @@ const ComboDetailsPage = () => {
               variant="h5"
               sx={{ color: "#000", fontWeight: 700, textAlign: "left", mt: 2 }}
             >
-              {combo?.name}
+              {product?.name}
             </Typography>
             <Box
               sx={{
@@ -197,17 +183,18 @@ const ComboDetailsPage = () => {
               }}
             >
               <Typography variant="body2">
-                <strong>Description:</strong> {combo?.description}
+                <strong>Description:</strong> {product?.description}
               </Typography>
               <Typography variant="body2">
-                <strong>Ingredients:</strong> {concatenatedNames}
+                <strong>Unit In Stock:</strong> {product?.unitInStock}
               </Typography>
               <Typography variant="body2">
-                <strong>Suitable for:</strong> {concatenatedNamesBird}
+                <strong>Expired Date: </strong>
+                {product?.expiredDate}
               </Typography>
               <Typography variant="h6">
                 Price:{" "}
-                {combo?.price.toLocaleString("vi", {
+                {product?.price.toLocaleString("vi", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -221,7 +208,7 @@ const ComboDetailsPage = () => {
                 <Button
                   variant="contained"
                   endIcon={<AddShoppingCartIcon />}
-                  onClick={() => combo && handleAddToCart(combo)}
+                  onClick={() => product && handleAddToCart(product)}
                 >
                   Add To Cart
                 </Button>
@@ -229,13 +216,17 @@ const ComboDetailsPage = () => {
             )}
             {user.role == "Staff" && (
               <Stack direction="row" spacing={2} sx={{ m: 2, ml: 0 }}>
-                <Button variant="outlined" startIcon={<DeleteForeverIcon />} color="error">
+                <Button
+                  variant="outlined"
+                  startIcon={<DeleteForeverIcon />}
+                  color="error"
+                >
                   Delete
                 </Button>
                 <Button
                   variant="contained"
                   endIcon={<EditIcon />}
-                  onClick={() => combo && handleAddToCart(combo)}
+                  onClick={() => product && handleAddToCart(product)}
                 >
                   Edit
                 </Button>
@@ -455,5 +446,4 @@ const ComboDetailsPage = () => {
       </Stack>
     </>
   );
-};
-export default ComboDetailsPage;
+}

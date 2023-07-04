@@ -8,12 +8,14 @@ import LoginPage from "./LoginPage";
 import CheckoutPage from "./CheckoutPage";
 import CreateProductPage from "./CreateProductPage";
 import CreateComboPage from "./CreateComboPage";
+import ManageOrderPage from './ManageOrderPage';
 
 export {
   ComboPage,
   ComboDetailsPage,
   OrderPage,
   OrderDetailsPage,
+  ManageOrderPage,
   ProfilePage,
   LoginPage,
   RegisterPage,

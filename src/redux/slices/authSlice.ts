@@ -4,11 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface AuthState {
   isAuthenticated: boolean;
   accessToken: string;
+  expirationTime: number;
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   accessToken: "",
+  expirationTime: 0,
 };
 
 export const authSlice = createSlice({
@@ -22,10 +24,12 @@ export const authSlice = createSlice({
       // immutable state based off those changes
       state.isAuthenticated = true;
       state.accessToken = action.payload;
+      state.expirationTime = Date.now() + 3600000;
     },
     logout: (state) => {
       state.isAuthenticated = false;
       state.accessToken = "";
+      state.expirationTime = 0;
     },
   },
 });

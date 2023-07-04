@@ -1,7 +1,7 @@
-import { Product } from "../../Product/models/Product";
-import { BirdSpecies } from "./BirdSpecies";
+import { BirdSpecies } from ".";
+import { Product } from "../../Product/models";
 
-export type Combo = {
+export type ComboDetails = {
   id: number;
   name: string;
   description: string;

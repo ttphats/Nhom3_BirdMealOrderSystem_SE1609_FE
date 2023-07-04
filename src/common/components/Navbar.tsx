@@ -47,10 +47,6 @@ let navItems = [
     path: AppRoutes.order,
   },
   {
-    title: "Order Details",
-    path: AppRoutes.orderdetails,
-  },
-  {
     title: "My Profile",
     path: AppRoutes.profile,
   },
@@ -74,6 +70,10 @@ export default function Navbar({ window }: Props) {
       {
         title: "Product",
         path: AppRoutes.product,
+      },
+      {
+        title: "Orders",
+        path: AppRoutes.manageOrders,
       },
       {
         title: "My Profile",
