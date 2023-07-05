@@ -9,6 +9,8 @@ import CheckoutPage from "./CheckoutPage";
 import CreateProductPage from "./CreateProductPage";
 import CreateComboPage from "./CreateComboPage";
 import ManageOrderPage from './ManageOrderPage';
+import EditComboPage from './EditComboPage';
+import EditProductPage from "./EditProductPage";
 
 export {
   ComboPage,
@@ -22,4 +24,6 @@ export {
   CheckoutPage,
   CreateProductPage,
   CreateComboPage,
+  EditComboPage,
+  EditProductPage,
 };

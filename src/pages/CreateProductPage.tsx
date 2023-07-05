@@ -39,6 +39,7 @@ const CreateProductPage = () => {
       const payload: CreateProductForm = {
         form: {
           Name: data.Name,
+          Description: data.Description,
           UnitInStock: data.UnitInStock,
           Price: data.Price,
           ExpiredDate: data.ExpiredDate,
@@ -88,6 +89,15 @@ const CreateProductPage = () => {
               margin="normal"
             />
             {errors.Name && <p>This field is required</p>}
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Description"
+              {...register("Description", { required: true })}
+              fullWidth
+              margin="normal"
+            />
+            {errors.Description && <p>This field is required</p>}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField

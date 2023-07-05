@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
 import { Provider } from "react-redux";
@@ -12,19 +12,22 @@ import router from "./router/router";
 
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
+import Spinner from "./pages/Admin/views/Spinner/Spinner";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <HelmetProvider>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <App>
-            <RouterProvider router={router} />
+      <Suspense fallback={<Spinner />}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <App>
+              <RouterProvider router={router} />
 
-            <ToastContainer />
-          </App>
-        </PersistGate>
-      </Provider>
+              <ToastContainer />
+            </App>
+          </PersistGate>
+        </Provider>
+      </Suspense>
     </HelmetProvider>
   </React.StrictMode>
 );

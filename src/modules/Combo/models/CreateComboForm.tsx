@@ -2,6 +2,7 @@ export interface CreateComboForm {
   form: {
     Name: string;
     Status: number;
+    Description: string;
     ComboProducts: {
         productId: number;
         quantity: number;
@@ -10,5 +11,5 @@ export interface CreateComboForm {
         id: number;
     }[];
   };
-  imageFile: File;
+  imageFile: File | null;
 }

@@ -1,10 +1,11 @@
 export interface CreateProductForm {
   form: {
     Name: string;
+    Description: string;
     UnitInStock: number;
     Price: number;
-    ExpiredDate: string;
+    ExpiredDate: Date;
     Status: number;
   };
-  imageFile: File;
+  imageFile: File | null;
 }

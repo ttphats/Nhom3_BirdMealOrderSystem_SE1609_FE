@@ -5,11 +5,12 @@ export type Product = {
   unitInStock: number;
   price: number;
   type: number;
-  expiredDate: string;
+  expiredDate: Date;
   status: string;
   imgUrl: string;
   createdById: number;
   createdDate: string;
   updatedById: number;
   updatedDate: string;
+  quantity: string;
 };

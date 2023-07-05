@@ -11,6 +11,8 @@ import { Product } from "./models";
 import { useAppSelector } from "../../redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import AppRoutes from "../../router/AppRoutes";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import EditIcon from '@mui/icons-material/Edit';
 
 type Props = {
   item: Product;
@@ -86,7 +88,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
             marginLeft: 2,
             position: "relative",
             bottom: "25px",
-            mt: 1
+            mt: 1,
           }}
         >
           <Typography
@@ -102,10 +104,34 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
             Unit In Stock: {item.unitInStock}
           </Typography>
           <Typography variant="body2" sx={{ color: "#fff", textAlign: "left" }}>
-            Expired Date: {item.expiredDate}
+            Expired Date:{" "}
+            {(item?.expiredDate &&
+              new Date(item.expiredDate).toLocaleDateString("vi-VN")) ||
+              "N/A"}
           </Typography>
         </CardContent>
       </Link>
+
+      {/* Staff Action Block */}
+      {user.role == "Staff" && (
+        <CardActions
+          disableSpacing
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            bottom: 0,
+          }}
+        >
+          <IconButton aria-label="add to favorites" sx={{ color: "red" }}>
+            <DeleteForeverIcon />
+          </IconButton>
+          <Link to={`/editProduct/${item.id}`}>
+            <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
+              <EditIcon />
+            </IconButton>
+          </Link>
+        </CardActions>
+      )}
 
       {item.status == "Active" && user.role == "Staff" ? (
         <StyledInfo

@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AppRoutes from "../router/AppRoutes";
 import StarIcon from "@mui/icons-material/Star";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -38,7 +38,7 @@ import {
 import feedbackApi from "../modules/Feedback/apis/feedbackApi";
 import { Feedback } from "../modules/Feedback/models";
 import { toast } from "react-toastify";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -93,7 +93,7 @@ const ComboDetailsPage = () => {
             fetchFeedbackData();
           })
           .catch((error) => {
-            toast.error(error?.response?.data)
+            toast.error(error?.response?.data);
             console.error("Error submitting feedback:", error);
           });
       }
@@ -284,13 +284,11 @@ const ComboDetailsPage = () => {
                 >
                   Delete
                 </Button>
-                <Button
-                  variant="contained"
-                  endIcon={<EditIcon />}
-                  onClick={() => combo && handleAddToCart(combo)}
-                >
-                  Edit
-                </Button>
+                <Link to={`/editCombo/${id}`}>
+                  <Button variant="contained" endIcon={<EditIcon />}>
+                    Edit
+                  </Button>
+                </Link>
               </Stack>
             )}
             {!user.role && (
@@ -346,7 +344,11 @@ const ComboDetailsPage = () => {
               onChange={(e) => setFeedback(e.target.value)}
               sx={{ flex: 1, ml: 2, mr: 2 }}
             />
-            <Button variant="contained" onClick={submitFeedback} startIcon={<SendIcon />}>
+            <Button
+              variant="contained"
+              onClick={submitFeedback}
+              startIcon={<SendIcon />}
+            >
               Send
             </Button>
           </Paper>
@@ -429,9 +431,15 @@ const ComboDetailsPage = () => {
                           color: "#ccc",
                         }}
                       >
-                       {feedbackItem?.createdDate && new Date(feedbackItem.createdDate).toLocaleTimeString("vi-VN")}
+                        {feedbackItem?.createdDate &&
+                          new Date(feedbackItem.createdDate).toLocaleTimeString(
+                            "vi-VN"
+                          )}
                         &nbsp;
-                       {feedbackItem?.createdDate && new Date(feedbackItem.createdDate).toLocaleDateString("vi-VN")}
+                        {feedbackItem?.createdDate &&
+                          new Date(feedbackItem.createdDate).toLocaleDateString(
+                            "vi-VN"
+                          )}
                       </Typography>
                     </Box>
                   </Box>

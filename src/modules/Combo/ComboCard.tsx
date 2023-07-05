@@ -119,13 +119,11 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
           <IconButton aria-label="add to favorites" sx={{ color: "red" }}>
             <DeleteForeverIcon />
           </IconButton>
-          <IconButton
-            aria-label="share"
-            sx={{ color: "lightgreen" }}
-            onClick={() => handleAddToCart(item)}
-          >
-            <EditIcon />
-          </IconButton>
+          <Link to={`/editCombo/${item.id}`}>
+            <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
+              <EditIcon />
+            </IconButton>
+          </Link>
         </CardActions>
       )}
       {/* Customer Action Block */}

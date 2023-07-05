@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouteObject } from "react-router-dom";
-
 import { LoginLayout, MainLayout } from "../layouts/";
 import {
   ComboPage,
@@ -13,10 +12,14 @@ import {
   CreateProductPage,
   CreateComboPage,
   ManageOrderPage,
+  EditComboPage,
+  EditProductPage,
 } from "../pages";
 import AppRoutes from "./AppRoutes";
 import ProductPage from "../pages/ProductPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
+import Dashboard1 from "./../pages/Admin/views/dashboards/Dashboard1";
+import ManageCustomersPage from "../pages/Admin/views/customer/ManageCustomersPage";
 
 const routes: RouteObject[] = [
   {
@@ -64,6 +67,10 @@ const routes: RouteObject[] = [
         element: <CreateComboPage />,
       },
       {
+        path: AppRoutes.editCombo,
+        element: <EditComboPage />,
+      },
+      {
         path: AppRoutes.combodetails,
         element: <ComboDetailsPage />,
       },
@@ -72,13 +79,25 @@ const routes: RouteObject[] = [
         element: <ProductDetailsPage />,
       },
       {
+        path: AppRoutes.editProduct,
+        element: <EditProductPage />,
+      },
+      {
         path: AppRoutes.manageOrders,
         element: <ManageOrderPage />,
+      },
+      {
+        path: AppRoutes.dashboard,
+        element: <Dashboard1 />,
+      },
+      {
+        path: AppRoutes.customers,
+        element: <ManageCustomersPage />,
       },
     ],
   },
   {
-    path: '/',
+    path: "/",
     element: <LoginLayout />,
     children: [
       {
@@ -89,9 +108,8 @@ const routes: RouteObject[] = [
         path: AppRoutes.register,
         element: <RegisterPage />,
       },
-    ]
+    ],
   },
-  
 ];
 
 const router = createBrowserRouter(routes);

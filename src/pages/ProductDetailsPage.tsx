@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import AppRoutes from "../router/AppRoutes";
 import StarIcon from "@mui/icons-material/Star";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -36,7 +36,7 @@ import { AddShoppingCart } from "@mui/icons-material";
 import { Cart } from "../modules/Cart";
 import { Feedback } from "../modules/Feedback/models";
 import feedbackApi from "../modules/Feedback/apis/feedbackApi";
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from "@mui/icons-material/Send";
 import { toast } from "react-toastify";
 
 const StyledButton = styled(IconButton)`
@@ -93,7 +93,7 @@ export default function ProductDetailsPage() {
             fetchFeedbackData();
           })
           .catch((error) => {
-            toast.error(error?.response?.data)
+            toast.error(error?.response?.data);
             console.error("Error submitting feedback:", error);
           });
       }
@@ -239,11 +239,12 @@ export default function ProductDetailsPage() {
               </Typography>
               <Typography variant="body2">
                 <strong>Expired Date: </strong>
-                {product?.expiredDate}
+                {product?.expiredDate &&
+                  new Date(product.expiredDate).toLocaleDateString("vi-VN")  || "N/A"}
               </Typography>
               <Typography variant="h6">
                 Price:{" "}
-                {product?.price.toLocaleString("vi", {
+                {product?.price?.toLocaleString("vi", {
                   style: "currency",
                   currency: "VND",
                 })}
@@ -272,13 +273,11 @@ export default function ProductDetailsPage() {
                 >
                   Delete
                 </Button>
-                <Button
-                  variant="contained"
-                  endIcon={<EditIcon />}
-                  onClick={() => product && handleAddToCart(product)}
-                >
-                  Edit
-                </Button>
+                <Link to={`/editProduct/${id}`}>
+                  <Button variant="contained" endIcon={<EditIcon />}>
+                    Edit
+                  </Button>
+                </Link>
               </Stack>
             )}
             {!user.role && (
