@@ -25,6 +25,7 @@ const productApi = {
         "Content-Type": "multipart/form-data",
       },
     }),
+  delete: (id: number) => AxiosClient.delete(`/staff/Products/${id}`),
   getDetails: (id: number): Promise<Product> =>
     AxiosClient.get(`/guest/Products/${id}`),
 };

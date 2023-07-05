@@ -26,6 +26,7 @@ const comboApi = {
         "Content-Type": "multipart/form-data",
       },
     }),
+  delete: (id: number) => AxiosClient.delete(`/staff/Combos/${id}`),
   getDetails: (id: number): Promise<Combo> =>
     AxiosClient.get(`/guest/Combos/detail/${id}`),
   search: (query: string): Promise<Combo[]> =>

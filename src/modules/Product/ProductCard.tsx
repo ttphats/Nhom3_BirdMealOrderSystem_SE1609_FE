@@ -6,13 +6,24 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import CircleIcon from "@mui/icons-material/Circle";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { Box, Typography, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Typography,
+  styled,
+} from "@mui/material";
 import { Product } from "./models";
 import { useAppSelector } from "../../redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import AppRoutes from "../../router/AppRoutes";
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import EditIcon from '@mui/icons-material/Edit';
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import EditIcon from "@mui/icons-material/Edit";
+import { useState } from "react";
+import productApi from "./apis/productApi";
+import { toast } from "react-toastify";
 
 type Props = {
   item: Product;
@@ -30,6 +41,26 @@ const StyledInfo = styled("div")(({ theme }) => ({
 export default function ProductCard({ item, handleAddToCart }: Props) {
   const user = useAppSelector((state) => state.profile.user.data);
   const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
+  const handleDelete = () => {
+    setOpenDialog(true);
+  };
+
+  const handleConfirmDelete = (id: number) => {
+    productApi
+      .delete(id)
+      .then(() => {
+        toast.success("Delete successfully");
+        setOpenDialog(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleCancelDelete = () => {
+    setOpenDialog(false);
+  };
   return (
     <Card
       sx={{
@@ -122,7 +153,11 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
             bottom: 0,
           }}
         >
-          <IconButton aria-label="add to favorites" sx={{ color: "red" }}>
+          <IconButton
+            aria-label="add to favorites"
+            sx={{ color: "red" }}
+            onClick={handleDelete}
+          >
             <DeleteForeverIcon />
           </IconButton>
           <Link to={`/editProduct/${item.id}`}>
@@ -231,6 +266,21 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           </IconButton>
         </CardActions>
       )}
+      <Dialog open={openDialog} onClose={handleCancelDelete}>
+        <DialogTitle>
+          Confirm to delete <strong>{item?.name}</strong>
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button
+            onClick={() => handleConfirmDelete(item.id)}
+            variant="contained"
+            color="error"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 }
