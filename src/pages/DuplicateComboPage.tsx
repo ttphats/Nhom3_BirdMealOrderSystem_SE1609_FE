@@ -28,7 +28,7 @@ import { FieldError, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import AppRoutes from "../router/AppRoutes";
 
-const DuplicateCombo = () => {
+const DuplicateComboPage = () => {
   const {
     register,
     handleSubmit,
@@ -62,6 +62,15 @@ const DuplicateCombo = () => {
           setNameValue(combo?.name || "");
           setDescriptionValue(combo?.description || "");
           setImagePreview(combo?.imgUrl || null);
+          setSelectedProducts(
+            combo?.products.map((product: Product) => ({
+              productId: product.id,
+              quantity: parseInt(product.quantity, 10),
+            })) || []
+          );
+          setSelectedBirdSpecies(
+            combo?.birdSpecies.map((bird: BirdSpecies) => bird.id) || []
+          );
         })
         .catch((err) => console.log(err));
     }
@@ -114,6 +123,7 @@ const DuplicateCombo = () => {
       .then((response: any) => {
         const birdSpecies = response.data;
         setBirdSpecies(birdSpecies);
+        setSelectedBirdSpecies(birdSpecies);
       })
       .catch((err) => console.log(err));
   };
@@ -135,7 +145,11 @@ const DuplicateCombo = () => {
   };
 
   const handleProductSelection = (productId: number, quantity: number) => {
-    if (selectedProducts.some((product) => product.productId === productId)) {
+    const isSelected = selectedProducts.some(
+      (product) => product.productId === productId
+    );
+
+    if (isSelected) {
       setSelectedProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.productId === productId ? { ...product, quantity } : product
@@ -159,6 +173,46 @@ const DuplicateCombo = () => {
     }
   };
 
+  const renderSelectedProducts = () => {
+    return selectedProducts.map((product) => {
+      const productData = products.find((p) => p.id === product.productId);
+      if (productData) {
+        return (
+          <TableRow key={productData.id}>
+            <TableCell>{productData.name}</TableCell>
+            <TableCell>
+              <TextField
+                type="number"
+                value={product.quantity}
+                onChange={(e) =>
+                  handleProductSelection(
+                    product.productId,
+                    parseInt(e.target.value, 10)
+                  )
+                }
+              />
+            </TableCell>
+          </TableRow>
+        );
+      }
+      return null;
+    });
+  };
+
+  const renderSelectedBirdSpecies = () => {
+    return selectedBirdSpecies.map((speciesId) => {
+      const species = birdSpecies.find((s) => s.id === speciesId);
+      if (species) {
+        return (
+          <TableRow key={species.id}>
+            <TableCell>{species.name}</TableCell>
+          </TableRow>
+        );
+      }
+      return null;
+    });
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     if (!fileUpload && imagePreview) {
@@ -175,27 +229,10 @@ const DuplicateCombo = () => {
       }));
     }
 
-    if (comboData && comboData.products) {
-      const comboProductsData = comboData.products.map((product) => ({
-        productId: product.id,
-        quantity: parseInt(product.quantity, 10),
-      }));
-
-      selectedProductsData = [...selectedProductsData, ...comboProductsData];
-    }
-
     if (selectedBirdSpecies.length) {
       selectedBirdsData = selectedBirdSpecies.map((id) => ({
         id: id,
       }));
-    }
-
-    if (comboData && comboData.birdSpecies) {
-      const comboProductsData = comboData.birdSpecies.map((bird) => ({
-        id: bird.id,
-      }));
-
-      selectedBirdsData = [...selectedBirdsData, ...comboProductsData];
     }
 
     const payload: CreateComboForm = {
@@ -318,7 +355,7 @@ const DuplicateCombo = () => {
         elevation={3}
         sx={{ p: 2, borderRadius: "10px", maxWidth: "30rem", m: 2 }}
       >
-        <DialogTitle>Create Combo With Duplicate</DialogTitle>
+        <DialogTitle>Edit Combo</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
@@ -370,33 +407,7 @@ const DuplicateCombo = () => {
               </Button>
               <TableContainer>
                 <Table>
-                  <TableBody>
-                    {comboData?.products.map((comboProduct) => {
-                      const productData = products.find(
-                        (p) => p.id === comboProduct.id
-                      );
-                      if (productData) {
-                        return (
-                          <TableRow key={productData.id}>
-                            <TableCell>{productData.name}</TableCell>
-                            <TableCell>
-                              <TextField
-                                type="number"
-                                value={comboProduct.quantity}
-                                onChange={(e) =>
-                                  handleProductSelection(
-                                    comboProduct.id,
-                                    parseInt(e.target.value, 10)
-                                  )
-                                }
-                              />
-                            </TableCell>
-                          </TableRow>
-                        );
-                      }
-                      return null;
-                    })}
-                  </TableBody>
+                  <TableBody>{renderSelectedProducts()}</TableBody>
                 </Table>
               </TableContainer>
             </Grid>
@@ -409,21 +420,7 @@ const DuplicateCombo = () => {
                 Select Bird Species
               </Button>
               <TableContainer>
-                <TableBody>
-                  {comboData?.birdSpecies.map((species) => {
-                    const birdSpeciesData = birdSpecies.find(
-                      (s) => s.id === species.id
-                    );
-                    if (birdSpeciesData) {
-                      return (
-                        <TableRow key={birdSpeciesData.id}>
-                          <TableCell>{birdSpeciesData.name}</TableCell>
-                        </TableRow>
-                      );
-                    }
-                    return null;
-                  })}
-                </TableBody>
+                <TableBody>{renderSelectedBirdSpecies()}</TableBody>
               </TableContainer>
             </Grid>
             <Grid item xs={12}>
@@ -466,7 +463,7 @@ const DuplicateCombo = () => {
                 color="primary"
                 fullWidth
               >
-                Create with duplicate
+                Save
               </Button>
             </Grid>
           </Grid>
@@ -476,4 +473,4 @@ const DuplicateCombo = () => {
   );
 };
 
-export default DuplicateCombo;
+export default DuplicateComboPage;

@@ -20,6 +20,7 @@ import ProductPage from "../pages/ProductPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import Dashboard1 from "./../pages/Admin/views/dashboards/Dashboard1";
 import ManageCustomersPage from "../pages/Admin/views/customer/ManageCustomersPage";
+import DuplicateComboPage from "../pages/DuplicateComboPage";
 
 const routes: RouteObject[] = [
   {
@@ -73,6 +74,10 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.combodetails,
         element: <ComboDetailsPage />,
+      },
+      {
+        path: AppRoutes.duplicateCombo,
+        element: <DuplicateComboPage />,
       },
       {
         path: AppRoutes.productdetails,

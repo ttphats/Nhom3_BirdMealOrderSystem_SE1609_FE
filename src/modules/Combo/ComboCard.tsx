@@ -7,6 +7,8 @@ import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
+import DifferenceIcon from '@mui/icons-material/Difference';
+
 import {
   Box,
   Button,
@@ -152,6 +154,11 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
           >
             <DeleteForeverIcon />
           </IconButton>
+          <Link to={`/duplicateCombo/${item.id}`}>
+            <IconButton aria-label="share" sx={{ color: "lightpink" }}>
+              <DifferenceIcon />
+            </IconButton>
+          </Link>
           <Link to={`/editCombo/${item.id}`}>
             <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
               <EditIcon />

@@ -7,6 +7,7 @@ const AppRoutes = {
     createProduct: "/createProduct",
     createCombo: "/createCombo",
     editCombo: "/editCombo/:id",
+    duplicateCombo: "/duplicateCombo/:id",
     editProduct: "/editProduct/:id",
     order: "/orders",
     orderdetails: "/OrderDetails",
