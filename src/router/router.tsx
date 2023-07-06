@@ -21,6 +21,7 @@ import ProductDetailsPage from "../pages/ProductDetailsPage";
 import Dashboard1 from "./../pages/Admin/views/dashboards/Dashboard1";
 import ManageCustomersPage from "../pages/Admin/views/customer/ManageCustomersPage";
 import DuplicateComboPage from "../pages/DuplicateComboPage";
+import CreateNewAccountPage from "../pages/Admin/views/customer/CreateNewAccountPage";
 
 const routes: RouteObject[] = [
   {
@@ -98,6 +99,10 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.customers,
         element: <ManageCustomersPage />,
+      },
+      {
+        path: AppRoutes.createNewAccount,
+        element: <CreateNewAccountPage />,
       },
     ],
   },

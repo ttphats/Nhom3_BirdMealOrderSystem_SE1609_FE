@@ -1,8 +1,9 @@
-export type RegisterForm = {
+export type Account = {
+  id: number;
   email: string;
   fullname: string;
   phoneNum: string;
   address: string;
-  password: string;
-  confirmPassword: string;
+  role: string;
+  status: string;
 };

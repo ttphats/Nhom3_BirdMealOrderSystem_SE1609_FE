@@ -61,7 +61,7 @@ export default function Navbar({ window }: Props) {
 
   console.log(user);
 
-  if (user.role == "Staff") {
+  if (user.role === "Staff") {
     navItems = [
       {
         title: "Combo",
@@ -82,11 +82,15 @@ export default function Navbar({ window }: Props) {
     ];
   }
 
-  if (user.role == "Admin") {
+  if (user.role === "Admin") {
     navItems = [
       {
         title: "Dashboard",
-        path: AppRoutes.combo,
+        path: AppRoutes.dashboard,
+      },
+      {
+        title: "Customer",
+        path: AppRoutes.customers,
       },
       {
         title: "Combo",

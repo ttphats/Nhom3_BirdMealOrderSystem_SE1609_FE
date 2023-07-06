@@ -2,8 +2,6 @@ import {
   Avatar,
   Box,
   Button,
-  FormControlLabel,
-  FormGroup,
   Link,
   TextField,
   Typography,
@@ -13,12 +11,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { object, string, TypeOf } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import Checkbox from "@mui/material/Checkbox";
-import Copyright from "../../common/components/Copyright";
-import AppRoutes from "../../router/AppRoutes";
 import { useNavigate } from "react-router-dom";
-import authApi from "./apis/authApi";
 import { toast } from "react-toastify";
+import AppRoutes from "../../../../router/AppRoutes";
+import { Copyright } from "@mui/icons-material";
+import authApi from "../../../../modules/Login/apis/authApi";
 
 const registerSchema = object({
   fullname: string()
@@ -41,7 +38,7 @@ const registerSchema = object({
 
 type registerinput = TypeOf<typeof registerSchema>;
 
-const Register = () => {
+const CreateNewAccountPage = () => {
   const navigate = useNavigate();
 
   const routeChange = (path: string) => {
@@ -67,8 +64,8 @@ const Register = () => {
     authApi
       .register(values)
       .then(() => {
-        toast.success("Register Successfully");
-        navigate(AppRoutes.login, { replace: true });
+        toast.success("Create New Account Successfully");
+        navigate(AppRoutes.customers, { replace: true });
       })
       .catch((errors) => {
         console.log(errors);
@@ -95,7 +92,7 @@ const Register = () => {
         component="h1"
         sx={{ mb: "2rem", color: "#000", fontWeight: 700 }}
       >
-        Register
+        Create New Account
       </Typography>
       <Box
         component="form"
@@ -164,36 +161,25 @@ const Register = () => {
           {...register("confirmPassword")}
         />
 
-        <FormGroup>
-          <FormControlLabel
-            control={<Checkbox required />}
-            label={
-              <Typography sx={{ color: "#000" }}>
-                Accept Terms and Conditions
-              </Typography>
-            }
-          />
-        </FormGroup>
-
         <Button
           variant="contained"
           fullWidth
           type="submit"
           sx={{ py: "0.8rem", mt: "1rem" }}
         >
-          Register
+          Create
         </Button>
       </Box>
       <Link
         variant="body2"
         sx={{ m: 2, cursor: "pointer" }}
-        onClick={() => routeChange(AppRoutes.login)}
+        onClick={() => routeChange(AppRoutes.dashboard)}
       >
-        Already have an account? Sign in
+        Back to Dashboard
       </Link>
       <Copyright sx={{ m: 2 }} />
     </Box>
   );
 };
 
-export default Register;
+export default CreateNewAccountPage;

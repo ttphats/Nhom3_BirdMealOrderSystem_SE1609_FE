@@ -246,8 +246,6 @@ const EditComboPage = () => {
       imageFile: fileUpload,
     };
 
-    console.log(payload);
-
     const formData = new FormData();
     formData.append("form", JSON.stringify(payload.form));
     if (fileUpload) {

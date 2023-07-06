@@ -18,6 +18,7 @@ const AppRoutes = {
     checkout: "/checkout",
     dashboard: "/dashboard",
     customers: "/customers",
+    createNewAccount: "/createNewAccount",
   };
   
   export default AppRoutes;
