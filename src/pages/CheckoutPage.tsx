@@ -4,12 +4,11 @@ import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Typography from "@mui/material/Typography";
-import { PaymentForm, AddressForm, Review } from "../modules/Checkout";
+import { AddressForm, Review } from "../modules/Checkout";
 import { AddressFormData } from "../modules/Checkout/AddressForm";
-import { PaymentFormData } from "../modules/Checkout/PaymentForm";
 import { useAppSelector } from "../redux/hooks";
 
-const steps = ["Shipping address", "Payment details", "Review your order"];
+const steps = ["Shipping address", "Review your order"];
 
 
 const defaultAddressFormData: AddressFormData = {
@@ -23,21 +22,10 @@ const defaultAddressFormData: AddressFormData = {
   saveAddress: false,
 };
 
-const defaultPaymentFormData: PaymentFormData = {
-  cardName: "",
-  cardNumber: "",
-  expDate: "",
-  cvv: "",
-  saveCard: false,
-};
-
 export default function Checkout() {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<AddressFormData>(
     defaultAddressFormData
-  );
-  const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>(
-    defaultPaymentFormData
   );
   const user = useAppSelector((state) => state.profile.user.data);
 
@@ -73,18 +61,8 @@ export default function Checkout() {
         );
       case 1:
         return (
-          <PaymentForm
-            paymentFormData={paymentFormData}
-            setPaymentFormData={setPaymentFormData}
-            handleNext={handleNext}
-            handleBack={handleBack}
-          />
-        );
-      case 2:
-        return (
           <Review
             formData={formData}
-            paymentFormData={paymentFormData}
             handleBack={handleBack}
           />
         );

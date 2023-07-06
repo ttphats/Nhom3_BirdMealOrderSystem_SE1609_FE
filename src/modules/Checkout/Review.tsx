@@ -6,7 +6,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Grid from "@mui/material/Grid";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AddressFormData } from "./AddressForm";
-import { PaymentFormData } from "./PaymentForm";
 import { Box, Button } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import SendIcon from "@mui/icons-material/Send";
@@ -18,17 +17,12 @@ import { clearCart } from "../../redux/slices/cartSlice";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../redux/hooks";
 
-interface PaymentFormProps {
+interface ReviewFormProps {
   formData: AddressFormData;
-  paymentFormData: PaymentFormData;
   handleBack: () => void;
 }
 
-export default function Review({
-  formData,
-  paymentFormData,
-  handleBack,
-}: PaymentFormProps) {
+export default function Review({ formData, handleBack }: ReviewFormProps) {
   const location = useLocation();
   const cartItems = location.state;
   const navigate = useNavigate();
@@ -40,26 +34,6 @@ export default function Review({
   }${formData.city ? `, ${formData.city}` : ""}${
     formData.country ? `, ${formData.country}` : ""
   }`;
-
-  const payments = [
-    { name: "Card type", detail: "Visa" },
-    {
-      name: "Card holder",
-      detail: paymentFormData.cardName
-        ? paymentFormData.cardName
-        : "Thai Thanh Phat",
-    },
-    {
-      name: "Card number",
-      detail: paymentFormData.cardNumber
-        ? paymentFormData.cardNumber
-        : "xxxx-xxxx-xxxx-1234",
-    },
-    {
-      name: "Expiry date",
-      detail: paymentFormData.expDate ? paymentFormData.expDate : "04/2024",
-    },
-  ];
 
   const calculateTotalPrice = () => {
     return cartItems.reduce((total: number, item: CartItemType) => {
@@ -87,7 +61,7 @@ export default function Review({
       }
       throw new Error("Invalid item");
     });
-  
+
     checkOutApi
       .order(address, formData.phoneNum, items)
       .then(() => {
@@ -140,23 +114,6 @@ export default function Review({
           </Typography>
           <Typography gutterBottom>{user.fullname}</Typography>
           <Typography gutterBottom>{address}</Typography>
-        </Grid>
-        <Grid item container direction="column" xs={12} sm={6}>
-          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-            Payment details
-          </Typography>
-          <Grid container>
-            {payments.map((payment) => (
-              <Fragment key={payment.name}>
-                <Grid item xs={6}>
-                  <Typography gutterBottom>{payment.name}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography gutterBottom>{payment.detail}</Typography>
-                </Grid>
-              </Fragment>
-            ))}
-          </Grid>
         </Grid>
       </Grid>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
