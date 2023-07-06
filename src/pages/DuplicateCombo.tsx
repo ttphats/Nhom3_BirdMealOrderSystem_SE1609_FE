@@ -23,10 +23,12 @@ import { Product } from "../modules/Product/models";
 import productApi from "../modules/Product/apis/productApi";
 import { toast } from "react-toastify";
 import comboApi from "../modules/Combo/apis/comboApi";
-import { BirdSpecies, CreateComboForm } from "../modules/Combo/models";
+import { BirdSpecies, Combo, CreateComboForm } from "../modules/Combo/models";
 import { FieldError, useForm } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
+import AppRoutes from "../router/AppRoutes";
 
-const CreateComboPage = () => {
+const DuplicateCombo = () => {
   const {
     register,
     handleSubmit,
@@ -41,15 +43,52 @@ const CreateComboPage = () => {
     { productId: number; quantity: number }[]
   >([]);
   const [selectedBirdSpecies, setSelectedBirdSpecies] = useState<number[]>([]);
+  const { id } = useParams();
+  const [comboData, setComboData] = useState<Combo>();
+  const [nameValue, setNameValue] = useState("");
+  const [descriptionValue, setDescriptionValue] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const fetchComboData = async () => {
+    if (id) {
+      const comboId = parseInt(id, 10);
+      await comboApi
+        .getDetails(comboId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const combo = response.data;
+          setComboData(combo);
+          setNameValue(combo?.name || "");
+          setDescriptionValue(combo?.description || "");
+          setImagePreview(combo?.imgUrl || null);
+        })
+        .catch((err) => console.log(err));
+    }
+  };
+
+  useEffect(() => {
+    fetchComboData();
+  }, [id]);
 
   const validateName = (value: string) => {
-    const words = value.split(" ");
-    const isInvalid = words.some((word) => !/^[A-Z]/.test(word));
-    if (isInvalid) {
-      return "Each word must start with an uppercase letter";
+    if (value === comboData?.name || !value.trim()) {
+      return true;
+    } else {
+      const words = value.split(" ");
+      const isInvalid = words.some((word) => !/^[A-Z]/.test(word));
+      if (isInvalid) {
+        return "Each word must start with an uppercase letter";
+      }
     }
     return true;
+  };
+
+  const validateDescription = (value: string) => {
+    if (value === comboData?.description || !value.trim()) {
+      return true;
+    }
+    return "This field is required";
   };
 
   useEffect(() => {
@@ -96,13 +135,11 @@ const CreateComboPage = () => {
   };
 
   const handleProductSelection = (productId: number, quantity: number) => {
-    const isSelected = selectedProducts.some(
-      (product) => product.productId === productId
-    );
-  
-    if (isSelected) {
+    if (selectedProducts.some((product) => product.productId === productId)) {
       setSelectedProducts((prevProducts) =>
-        prevProducts.filter((product) => product.productId !== productId)
+        prevProducts.map((product) =>
+          product.productId === productId ? { ...product, quantity } : product
+        )
       );
     } else {
       setSelectedProducts((prevProducts) => [
@@ -122,88 +159,73 @@ const CreateComboPage = () => {
     }
   };
 
-  const renderSelectedProducts = () => {
-    return selectedProducts.map((product) => {
-      const productData = products.find((p) => p.id === product.productId);
-      if (productData) {
-        return (
-          <TableRow key={productData.id}>
-            <TableCell>{productData.name}</TableCell>
-            <TableCell>
-              <TextField
-                type="number"
-                value={product.quantity}
-                onChange={(e) =>
-                  handleProductSelection(
-                    product.productId,
-                    parseInt(e.target.value, 10)
-                  )
-                }
-              />
-            </TableCell>
-          </TableRow>
-        );
-      }
-      return null;
-    });
-  };
-
-  const renderSelectedBirdSpecies = () => {
-    return selectedBirdSpecies.map((speciesId) => {
-      const species = birdSpecies.find((s) => s.id === speciesId);
-      if (species) {
-        return (
-          <TableRow key={species.id}>
-            <TableCell>{species.name}</TableCell>
-          </TableRow>
-        );
-      }
-      return null;
-    });
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
-    if (fileUpload) {
-      const selectedProductsData = products
-        .filter((product) =>
-          selectedProducts.find((p) => p.productId === product.id)
-        )
-        .map((product) => ({
-          productId: product.id,
-          quantity:
-            selectedProducts.find((p) => p.productId === product.id)
-              ?.quantity || 1,
-        }));
-
-      const payload: CreateComboForm = {
-        form: {
-          Name: data.Name,
-          Description: data.Description,
-          Status: data.Status,
-          ComboProducts: selectedProductsData,
-          BirdSpecies: selectedBirdSpecies.map((speciesId) => ({
-            id: speciesId,
-          })),
-        },
-        imageFile: fileUpload,
-      };
-
-      const formData = new FormData();
-      formData.append("form", JSON.stringify(payload.form));
-      formData.append("imageFile", fileUpload);
-
-      comboApi
-        .create(formData)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then((response: any) => {
-          toast.success(response.message);
-        })
-        .catch((error) => {
-          toast.error("Something went wrong. Please check again!");
-          console.error("Error:", error);
-        });
+    if (!fileUpload && imagePreview) {
+      setFileUpload(null);
     }
+
+    let selectedProductsData: { productId: number; quantity: number }[] = [];
+    let selectedBirdsData: { id: number }[] = [];
+
+    if (selectedProducts.length) {
+      selectedProductsData = selectedProducts.map((selectedProduct) => ({
+        productId: selectedProduct.productId,
+        quantity: selectedProduct.quantity || 1,
+      }));
+    }
+
+    if (comboData && comboData.products) {
+      const comboProductsData = comboData.products.map((product) => ({
+        productId: product.id,
+        quantity: parseInt(product.quantity, 10),
+      }));
+
+      selectedProductsData = [...selectedProductsData, ...comboProductsData];
+    }
+
+    if (selectedBirdSpecies.length) {
+      selectedBirdsData = selectedBirdSpecies.map((id) => ({
+        id: id,
+      }));
+    }
+
+    if (comboData && comboData.birdSpecies) {
+      const comboProductsData = comboData.birdSpecies.map((bird) => ({
+        id: bird.id,
+      }));
+
+      selectedBirdsData = [...selectedBirdsData, ...comboProductsData];
+    }
+
+    const payload: CreateComboForm = {
+      form: {
+        Name: data.Name || comboData?.name,
+        Description: data.Description || comboData?.description,
+        Status: data.Status,
+        ComboProducts: selectedProductsData,
+        BirdSpecies: selectedBirdsData,
+      },
+      imageFile: fileUpload,
+    };
+
+    const formData = new FormData();
+    formData.append("form", JSON.stringify(payload.form));
+    if (fileUpload) {
+      formData.append("imageFile", fileUpload);
+    }
+
+    comboApi
+      .create(formData)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((response: any) => {
+        toast.success(response.message);
+        navigate(AppRoutes.combo, { replace: true });
+      })
+      .catch((error) => {
+        toast.error("Something went wrong. Please check again!");
+        console.error("Error:", error);
+      });
   };
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,18 +318,20 @@ const CreateComboPage = () => {
         elevation={3}
         sx={{ p: 2, borderRadius: "10px", maxWidth: "30rem", m: 2 }}
       >
-        <DialogTitle>Create Combo</DialogTitle>
+        <DialogTitle>Create Combo With Duplicate</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
               <TextField
                 label="Name"
                 {...register("Name", {
-                  required: true,
                   validate: validateName,
+                  required: errors.Name ? true : false,
                 })}
                 fullWidth
                 margin="normal"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
               />
               {errors.Name && (
                 <p style={{ color: "red" }}>
@@ -320,16 +344,18 @@ const CreateComboPage = () => {
               <TextField
                 label="Description"
                 {...register("Description", {
-                  required: true,
+                  validate: validateDescription,
+                  required: errors.Description ? true : false,
                 })}
-                multiline
-
                 fullWidth
+                multiline
                 margin="normal"
+                value={descriptionValue}
+                onChange={(e) => setDescriptionValue(e.target.value)}
               />
               {errors.Description && (
                 <p style={{ color: "red" }}>
-                  {(errors.Description as FieldError)?.message ||
+                  {(errors.Name as FieldError)?.message ||
                     "This field is required"}
                 </p>
               )}
@@ -344,7 +370,33 @@ const CreateComboPage = () => {
               </Button>
               <TableContainer>
                 <Table>
-                  <TableBody>{renderSelectedProducts()}</TableBody>
+                  <TableBody>
+                    {comboData?.products.map((comboProduct) => {
+                      const productData = products.find(
+                        (p) => p.id === comboProduct.id
+                      );
+                      if (productData) {
+                        return (
+                          <TableRow key={productData.id}>
+                            <TableCell>{productData.name}</TableCell>
+                            <TableCell>
+                              <TextField
+                                type="number"
+                                value={comboProduct.quantity}
+                                onChange={(e) =>
+                                  handleProductSelection(
+                                    comboProduct.id,
+                                    parseInt(e.target.value, 10)
+                                  )
+                                }
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                      return null;
+                    })}
+                  </TableBody>
                 </Table>
               </TableContainer>
             </Grid>
@@ -357,9 +409,21 @@ const CreateComboPage = () => {
                 Select Bird Species
               </Button>
               <TableContainer>
-                <Table>
-                  <TableBody>{renderSelectedBirdSpecies()}</TableBody>
-                </Table>
+                <TableBody>
+                  {comboData?.birdSpecies.map((species) => {
+                    const birdSpeciesData = birdSpecies.find(
+                      (s) => s.id === species.id
+                    );
+                    if (birdSpeciesData) {
+                      return (
+                        <TableRow key={birdSpeciesData.id}>
+                          <TableCell>{birdSpeciesData.name}</TableCell>
+                        </TableRow>
+                      );
+                    }
+                    return null;
+                  })}
+                </TableBody>
               </TableContainer>
             </Grid>
             <Grid item xs={12}>
@@ -368,7 +432,7 @@ const CreateComboPage = () => {
                 <Select
                   labelId="status-label"
                   {...register("Status", { required: true })}
-                  defaultValue="1"
+                  defaultValue={comboData?.status.toString() || "1"}
                 >
                   <MenuItem value="1">Active</MenuItem>
                   <MenuItem value="0">Inactive</MenuItem>
@@ -402,7 +466,7 @@ const CreateComboPage = () => {
                 color="primary"
                 fullWidth
               >
-                Create
+                Create with duplicate
               </Button>
             </Grid>
           </Grid>
@@ -412,4 +476,4 @@ const CreateComboPage = () => {
   );
 };
 
-export default CreateComboPage;
+export default DuplicateCombo;

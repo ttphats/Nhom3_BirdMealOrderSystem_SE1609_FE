@@ -62,6 +62,15 @@ const EditComboPage = () => {
           setNameValue(combo?.name || "");
           setDescriptionValue(combo?.description || "");
           setImagePreview(combo?.imgUrl || null);
+          setSelectedProducts(
+            combo?.products.map((product: Product) => ({
+              productId: product.id,
+              quantity: parseInt(product.quantity, 10),
+            })) || []
+          );
+          setSelectedBirdSpecies(
+            combo?.birdSpecies.map((bird: BirdSpecies) => bird.id) || []
+          );
         })
         .catch((err) => console.log(err));
     }
@@ -114,6 +123,7 @@ const EditComboPage = () => {
       .then((response: any) => {
         const birdSpecies = response.data;
         setBirdSpecies(birdSpecies);
+        setSelectedBirdSpecies(birdSpecies);
       })
       .catch((err) => console.log(err));
   };
@@ -135,7 +145,11 @@ const EditComboPage = () => {
   };
 
   const handleProductSelection = (productId: number, quantity: number) => {
-    if (selectedProducts.some((product) => product.productId === productId)) {
+    const isSelected = selectedProducts.some(
+      (product) => product.productId === productId
+    );
+
+    if (isSelected) {
       setSelectedProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.productId === productId ? { ...product, quantity } : product
@@ -159,6 +173,46 @@ const EditComboPage = () => {
     }
   };
 
+  const renderSelectedProducts = () => {
+    return selectedProducts.map((product) => {
+      const productData = products.find((p) => p.id === product.productId);
+      if (productData) {
+        return (
+          <TableRow key={productData.id}>
+            <TableCell>{productData.name}</TableCell>
+            <TableCell>
+              <TextField
+                type="number"
+                value={product.quantity}
+                onChange={(e) =>
+                  handleProductSelection(
+                    product.productId,
+                    parseInt(e.target.value, 10)
+                  )
+                }
+              />
+            </TableCell>
+          </TableRow>
+        );
+      }
+      return null;
+    });
+  };
+
+  const renderSelectedBirdSpecies = () => {
+    return selectedBirdSpecies.map((speciesId) => {
+      const species = birdSpecies.find((s) => s.id === speciesId);
+      if (species) {
+        return (
+          <TableRow key={species.id}>
+            <TableCell>{species.name}</TableCell>
+          </TableRow>
+        );
+      }
+      return null;
+    });
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     if (!fileUpload && imagePreview) {
@@ -175,27 +229,10 @@ const EditComboPage = () => {
       }));
     }
 
-    if (comboData && comboData.products) {
-      const comboProductsData = comboData.products.map((product) => ({
-        productId: product.id,
-        quantity: parseInt(product.quantity, 10),
-      }));
-
-      selectedProductsData = [...selectedProductsData, ...comboProductsData];
-    }
-
     if (selectedBirdSpecies.length) {
       selectedBirdsData = selectedBirdSpecies.map((id) => ({
         id: id,
       }));
-    }
-
-    if (comboData && comboData.birdSpecies) {
-      const comboProductsData = comboData.birdSpecies.map((bird) => ({
-        id: bird.id,
-      }));
-
-      selectedBirdsData = [...selectedBirdsData, ...comboProductsData];
     }
 
     const payload: CreateComboForm = {
@@ -208,6 +245,8 @@ const EditComboPage = () => {
       },
       imageFile: fileUpload,
     };
+
+    console.log(payload);
 
     const formData = new FormData();
     formData.append("form", JSON.stringify(payload.form));
@@ -374,33 +413,7 @@ const EditComboPage = () => {
               </Button>
               <TableContainer>
                 <Table>
-                  <TableBody>
-                    {comboData?.products.map((comboProduct) => {
-                      const productData = products.find(
-                        (p) => p.id === comboProduct.id
-                      );
-                      if (productData) {
-                        return (
-                          <TableRow key={productData.id}>
-                            <TableCell>{productData.name}</TableCell>
-                            <TableCell>
-                              <TextField
-                                type="number"
-                                value={comboProduct.quantity}
-                                onChange={(e) =>
-                                  handleProductSelection(
-                                    comboProduct.id,
-                                    parseInt(e.target.value, 10)
-                                  )
-                                }
-                              />
-                            </TableCell>
-                          </TableRow>
-                        );
-                      }
-                      return null;
-                    })}
-                  </TableBody>
+                  <TableBody>{renderSelectedProducts()}</TableBody>
                 </Table>
               </TableContainer>
             </Grid>
@@ -413,21 +426,7 @@ const EditComboPage = () => {
                 Select Bird Species
               </Button>
               <TableContainer>
-                <TableBody>
-                  {comboData?.birdSpecies.map((species) => {
-                    const birdSpeciesData = birdSpecies.find(
-                      (s) => s.id === species.id
-                    );
-                    if (birdSpeciesData) {
-                      return (
-                        <TableRow key={birdSpeciesData.id}>
-                          <TableCell>{birdSpeciesData.name}</TableCell>
-                        </TableRow>
-                      );
-                    }
-                    return null;
-                  })}
-                </TableBody>
+                <TableBody>{renderSelectedBirdSpecies()}</TableBody>
               </TableContainer>
             </Grid>
             <Grid item xs={12}>

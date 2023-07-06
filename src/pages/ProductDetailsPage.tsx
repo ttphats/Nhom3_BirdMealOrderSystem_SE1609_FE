@@ -274,7 +274,7 @@ export default function ProductDetailsPage() {
                   Delete
                 </Button>
                 <Link to={`/editProduct/${id}`}>
-                  <Button variant="contained" endIcon={<EditIcon />}>
+                  <Button variant="contained" endIcon={<EditIcon />} sx={{backgroundColor: 'lightseagreen'}}>
                     Edit
                   </Button>
                 </Link>
@@ -337,6 +337,7 @@ export default function ProductDetailsPage() {
               variant="contained"
               onClick={submitFeedback}
               startIcon={<SendIcon />}
+              sx={{mr: 2}}
             >
               Send
             </Button>

@@ -39,6 +39,7 @@ import feedbackApi from "../modules/Feedback/apis/feedbackApi";
 import { Feedback } from "../modules/Feedback/models";
 import { toast } from "react-toastify";
 import SendIcon from "@mui/icons-material/Send";
+import DifferenceIcon from "@mui/icons-material/Difference";
 
 const StyledButton = styled(IconButton)`
   position: fixed;
@@ -284,8 +285,21 @@ const ComboDetailsPage = () => {
                 >
                   Delete
                 </Button>
+                <Link to={`/duplicateCombo/${combo?.id}`}>
+                  <Button
+                    variant="contained"
+                    endIcon={<DifferenceIcon />}
+                    sx={{ backgroundColor: "lightpink" }}
+                  >
+                    Duplicate
+                  </Button>
+                </Link>
                 <Link to={`/editCombo/${id}`}>
-                  <Button variant="contained" endIcon={<EditIcon />}>
+                  <Button
+                    variant="contained"
+                    endIcon={<EditIcon />}
+                    sx={{ backgroundColor: "lightseagreen" }}
+                  >
                     Edit
                   </Button>
                 </Link>
@@ -348,6 +362,7 @@ const ComboDetailsPage = () => {
               variant="contained"
               onClick={submitFeedback}
               startIcon={<SendIcon />}
+              sx={{ mr: 2 }}
             >
               Send
             </Button>

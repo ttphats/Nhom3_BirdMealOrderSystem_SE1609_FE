@@ -176,7 +176,7 @@ const EditProductPage = () => {
         elevation={3}
         sx={{ p: 2, borderRadius: "10px", maxWidth: "30rem", m: 2 }}
       >
-        <DialogTitle>Edit Combo</DialogTitle>
+        <DialogTitle>Edit Product</DialogTitle>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
@@ -308,7 +308,7 @@ const EditProductPage = () => {
                 fullWidth
                 margin="normal"
               />
-              {imagePreview && ( // Render image preview if available
+              {imagePreview && ( 
                 <img
                   src={imagePreview}
                   alt="Image Preview"
