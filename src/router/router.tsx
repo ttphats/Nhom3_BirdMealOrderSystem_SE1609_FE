@@ -22,6 +22,7 @@ import Dashboard1 from "./../pages/Admin/views/dashboards/Dashboard1";
 import ManageCustomersPage from "../pages/Admin/views/customer/ManageCustomersPage";
 import DuplicateComboPage from "../pages/DuplicateComboPage";
 import CreateNewAccountPage from "../pages/Admin/views/customer/CreateNewAccountPage";
+import AdminLayout from "../layouts/AdminLayout";
 
 const routes: RouteObject[] = [
   {
@@ -88,22 +89,6 @@ const routes: RouteObject[] = [
         path: AppRoutes.editProduct,
         element: <EditProductPage />,
       },
-      {
-        path: AppRoutes.manageOrders,
-        element: <ManageOrderPage />,
-      },
-      {
-        path: AppRoutes.dashboard,
-        element: <Dashboard1 />,
-      },
-      {
-        path: AppRoutes.customers,
-        element: <ManageCustomersPage />,
-      },
-      {
-        path: AppRoutes.createNewAccount,
-        element: <CreateNewAccountPage />,
-      },
     ],
   },
   {
@@ -117,6 +102,28 @@ const routes: RouteObject[] = [
       {
         path: AppRoutes.register,
         element: <RegisterPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <AdminLayout />,
+    children: [
+      {
+        path: AppRoutes.dashboard,
+        element: <Dashboard1 />,
+      },
+      {
+        path: AppRoutes.customers,
+        element: <ManageCustomersPage />,
+      },
+      {
+        path: AppRoutes.createNewAccount,
+        element: <CreateNewAccountPage />,
+      },
+      {
+        path: AppRoutes.manageOrders,
+        element: <ManageOrderPage />,
       },
     ],
   },

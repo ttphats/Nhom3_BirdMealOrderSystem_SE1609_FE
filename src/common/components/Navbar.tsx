@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -59,53 +59,83 @@ export default function Navbar({ window }: Props) {
   const auth = useAppSelector((state) => state.auth);
   const user = useAppSelector((state) => state.profile.user.data);
 
-  console.log(user);
+  console.log(user.role === "Admin");
 
-  if (user.role === "Staff") {
-    navItems = [
-      {
-        title: "Combo",
-        path: AppRoutes.combo,
-      },
-      {
-        title: "Product",
-        path: AppRoutes.product,
-      },
-      {
-        title: "Orders",
-        path: AppRoutes.manageOrders,
-      },
-      {
-        title: "My Profile",
-        path: AppRoutes.profile,
-      },
-    ];
-  }
-
-  if (user.role === "Admin") {
-    navItems = [
-      {
-        title: "Dashboard",
-        path: AppRoutes.dashboard,
-      },
-      {
-        title: "Customer",
-        path: AppRoutes.customers,
-      },
-      {
-        title: "Combo",
-        path: AppRoutes.combo,
-      },
-      {
-        title: "Product",
-        path: AppRoutes.product,
-      },
-      {
-        title: "My Profile",
-        path: AppRoutes.profile,
-      },
-    ];
-  }
+  useEffect(() => {
+    if (user.role === "Staff") {
+      navItems = [
+        {
+          title: "Manage Combo",
+          path: AppRoutes.combo,
+        },
+        {
+          title: "Manage Product",
+          path: AppRoutes.product,
+        },
+        {
+          title: "Manage Orders",
+          path: AppRoutes.manageOrders,
+        },
+        {
+          title: "My Profile",
+          path: AppRoutes.profile,
+        },
+      ];
+    } else if (user.role === "Admin") {
+      navItems = [
+        {
+          title: "Dashboard",
+          path: AppRoutes.dashboard,
+        },
+        {
+          title: "Customer",
+          path: AppRoutes.customers,
+        },
+        {
+          title: "Combo",
+          path: AppRoutes.combo,
+        },
+        {
+          title: "Product",
+          path: AppRoutes.product,
+        },
+        {
+          title: "My Profile",
+          path: AppRoutes.profile,
+        },
+      ];
+    } else if (!user.role) {
+      navItems = [
+        {
+          title: "Combo",
+          path: AppRoutes.combo,
+        },
+        {
+          title: "Product",
+          path: AppRoutes.product,
+        },
+      ];
+    } else if(user.role === 'Customer') {
+      navItems = [
+        {
+          title: "Combo",
+          path: AppRoutes.combo,
+        },
+        {
+          title: "Product",
+          path: AppRoutes.product,
+        },
+        {
+          title: "Orders",
+          path: AppRoutes.order,
+        },
+        {
+          title: "My Profile",
+          path: AppRoutes.profile,
+        },
+      ];
+    }
+  }, [user]);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 

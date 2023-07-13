@@ -219,7 +219,12 @@ export default function ComboPage() {
     const birdIdParam = selectedBirdId == 0 ? "" : String(selectedBirdId);
     fetchListCombo(sortOption, birdIdParam, currentPage);
     fetchListBird();
-  }, []);
+    if (user.role === "Admin") {
+      navigate(AppRoutes.dashboard);
+    } else {
+      navigate(AppRoutes.home);
+    }
+  }, [user]);
 
   return (
     <>

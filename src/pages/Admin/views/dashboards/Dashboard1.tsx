@@ -11,15 +11,20 @@ import {
 import { useAppSelector } from "../../../../redux/hooks";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "../../../../router/AppRoutes";
+import { useEffect } from "react";
 
 const Dashboard1 = () => {
   const user = useAppSelector((state) => state.profile.user.data);
   const navigate = useNavigate();
 
-  console.log(user.role !== "Admin");
-  if (user.role !== "Admin") {
-    navigate(AppRoutes.combo, { replace: true });
-  }
+  useEffect(() => {
+    if (user.role === "Admin") {
+      navigate(AppRoutes.dashboard);
+    } else {
+      navigate(AppRoutes.home);
+    }
+  }, [user]);
+
   return (
     <Box>
       <Grid container spacing={0}>
