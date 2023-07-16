@@ -1,7 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardContent, Typography, Box } from "@mui/material";
 import Chart from "react-apexcharts";
+import adminApi from "../../../../../modules/Admin/apis/adminApi";
+import { useEffect, useState } from "react";
 
 const SalesOverview = () => {
+  const [data, setData] = useState([]);
+  const [price, setPrice] = useState<any[]>([]);
+
+  const newDate = new Date();
+  const year = newDate.getFullYear();
+
+  const fetchRevenue = () => {
+    adminApi
+      .getRevenue(year)
+      .then((response: any) => {
+        console.log(response.data);
+        setData(response.data);
+      })
+      .then(() => {
+        const prices: any = data.map((item: any) => item?.totalPrice);
+        console.log(prices);
+        setPrice(prices);
+      });
+  };
+
+  useEffect(() => {
+    fetchRevenue();
+    console.log(price);
+  }, []);
+
   const optionssalesoverview: ApexCharts.ApexOptions = {
     grid: {
       show: true,
@@ -91,12 +119,8 @@ const SalesOverview = () => {
   };
   const seriessalesoverview = [
     {
-      name: "Combo",
-      data: [355, 390, 300, 350, 390, 180, 355, 390, 300, 350, 390, 180],
-    },
-    {
-      name: "Product",
-      data: [280, 250, 325, 215, 250, 310, 280, 250, 325, 215, 250, 310],
+      name: "Revenue",
+      data: price,
     },
   ];
 
@@ -146,30 +170,6 @@ const SalesOverview = () => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: "secondary.main",
-                  borderRadius: "50%",
-                  height: 8,
-                  width: 8,
-                  mr: 1,
-                }}
-              />
-              <Typography
-                variant="h6"
-                sx={{
-                  color: "secondary.main",
-                }}
-              >
-                Combo
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
                 marginLeft: "10px",
               }}
             >
@@ -188,7 +188,7 @@ const SalesOverview = () => {
                   color: "primary.main",
                 }}
               >
-                Product
+                Revenue of all orders in <strong>{year}</strong>
               </Typography>
             </Box>
           </Box>

@@ -31,6 +31,7 @@ const adminApi = {
       },
     }),
   banAccount: (userId: number) => AxiosClient.delete(`/admin/Users/Ban/${userId}`),
+  getRevenue: (year: number) => AxiosClient.get(`/admin/Chart/order/revenueMonthOfTheYear/${year}`),
 
 };
 
