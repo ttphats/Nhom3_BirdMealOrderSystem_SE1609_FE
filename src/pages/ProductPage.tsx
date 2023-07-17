@@ -96,18 +96,33 @@ export default function ProductPage() {
   };
 
   const fetchListProduct = (sortOption: string, page: number) => {
-    productApi
-      .staffFetchAll(sortOption, page, itemsPerPage)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((response: any) => {
-        const { data, pagination } = response;
-        const { totalPages } = pagination;
-        console.log(products);
-        setProducts(data);
-        setCurrentPage(page);
-        setTotalPages(totalPages);
-      })
-      .catch((err) => console.log(err));
+    if (user.role == "Staff" || user.role == "Admin") {
+      productApi
+        .staffFetchAll(sortOption, page, itemsPerPage)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const { data, pagination } = response;
+          const { totalPages } = pagination;
+          console.log(products);
+          setProducts(data);
+          setCurrentPage(page);
+          setTotalPages(totalPages);
+        })
+        .catch((err) => console.log(err));
+    } else {
+      productApi
+        .fetch(sortOption, page, itemsPerPage)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const { data, pagination } = response;
+          const { totalPages } = pagination;
+          console.log(products);
+          setProducts(data);
+          setCurrentPage(page);
+          setTotalPages(totalPages);
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   useEffect(() => {

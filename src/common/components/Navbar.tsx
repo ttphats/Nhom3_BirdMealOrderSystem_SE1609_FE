@@ -33,24 +33,6 @@ interface Props {
 }
 
 const drawerWidth = 240;
-let navItems = [
-  {
-    title: "Combo",
-    path: AppRoutes.combo,
-  },
-  {
-    title: "Product",
-    path: AppRoutes.product,
-  },
-  {
-    title: "Orders",
-    path: AppRoutes.order,
-  },
-  {
-    title: "My Profile",
-    path: AppRoutes.profile,
-  },
-];
 
 export default function Navbar({ window }: Props) {
   const navigate = useNavigate();
@@ -58,39 +40,90 @@ export default function Navbar({ window }: Props) {
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
   const user = useAppSelector((state) => state.profile.user.data);
+  const [navItems, setNavItems] = useState([
+    {
+      title: "Combo",
+      path: AppRoutes.combo,
+    },
+    {
+      title: "Product",
+      path: AppRoutes.product,
+    },
+  ]);
 
-  console.log(user.role === "Admin");
+  console.log(user.role === "Customer");
 
   useEffect(() => {
-    if (user.role === "Staff") {
-      navItems = [
-        {
-          title: "Manage Combo",
-          path: AppRoutes.combo,
-        },
-        {
-          title: "Manage Product",
-          path: AppRoutes.product,
-        },
-        {
-          title: "Manage Orders",
-          path: AppRoutes.manageOrders,
-        },
-        {
-          title: "My Profile",
-          path: AppRoutes.profile,
-        },
-      ];
-    } else if (user.role === "Admin") {
-      navItems = [
-        {
-          title: "Dashboard",
-          path: AppRoutes.dashboard,
-        },
-        {
-          title: "Customer",
-          path: AppRoutes.customers,
-        },
+    if (auth.isAuthenticated) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let updatedNavItems: any[] = [];
+
+      if (user.role === "Staff") {
+        updatedNavItems = [
+          {
+            title: "Manage Combo",
+            path: AppRoutes.combo,
+          },
+          {
+            title: "Manage Product",
+            path: AppRoutes.product,
+          },
+          {
+            title: "Manage Orders",
+            path: AppRoutes.manageOrders,
+          },
+          {
+            title: "My Profile",
+            path: AppRoutes.profile,
+          },
+        ];
+      } else if (user.role === "Admin") {
+        updatedNavItems = [
+          {
+            title: "Dashboard",
+            path: AppRoutes.dashboard,
+          },
+          {
+            title: "Customer",
+            path: AppRoutes.customers,
+          },
+          {
+            title: "Combo",
+            path: AppRoutes.combo,
+          },
+          {
+            title: "Product",
+            path: AppRoutes.product,
+          },
+          {
+            title: "My Profile",
+            path: AppRoutes.profile,
+          },
+        ];
+      } else if (user.role === "Customer") {
+        updatedNavItems = [
+          {
+            title: "Combo",
+            path: AppRoutes.combo,
+          },
+          {
+            title: "Product",
+            path: AppRoutes.product,
+          },
+          {
+            title: "Orders",
+            path: AppRoutes.order,
+          },
+          {
+            title: "My Profile",
+            path: AppRoutes.profile,
+          },
+        ];
+      }
+
+      setNavItems(updatedNavItems);
+    } else {
+      setNavItems([
         {
           title: "Combo",
           path: AppRoutes.combo,
@@ -99,43 +132,9 @@ export default function Navbar({ window }: Props) {
           title: "Product",
           path: AppRoutes.product,
         },
-        {
-          title: "My Profile",
-          path: AppRoutes.profile,
-        },
-      ];
-    } else if (!user.role) {
-      navItems = [
-        {
-          title: "Combo",
-          path: AppRoutes.combo,
-        },
-        {
-          title: "Product",
-          path: AppRoutes.product,
-        },
-      ];
-    } else if(user.role === 'Customer') {
-      navItems = [
-        {
-          title: "Combo",
-          path: AppRoutes.combo,
-        },
-        {
-          title: "Product",
-          path: AppRoutes.product,
-        },
-        {
-          title: "Orders",
-          path: AppRoutes.order,
-        },
-        {
-          title: "My Profile",
-          path: AppRoutes.profile,
-        },
-      ];
+      ]);
     }
-  }, [user]);
+  }, [auth.isAuthenticated, user]);
 
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -177,7 +176,7 @@ export default function Navbar({ window }: Props) {
             <ListItem disablePadding>
               <ListItemButton
                 sx={{ textAlign: "center" }}
-                onClick={() => () => {
+                onClick={() => {
                   dispatch(logout());
                   dispatch(remove());
                 }}

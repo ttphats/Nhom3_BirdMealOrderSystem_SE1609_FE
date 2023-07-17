@@ -35,7 +35,7 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
-  const user = useAppSelector((state) => state.profile.user.data)
+  const user = useAppSelector((state) => state.profile.user.data);
 
   const routeChange = (path: string) => {
     navigate(path, { replace: true });
@@ -64,27 +64,29 @@ export default function Login() {
       .then((response) => {
         const accessToken = response.data.accessToken;
         dispatch(login(accessToken));
-        dispatch(fetchUserProfile()).then(() => {
-          // Get the user profile from the Redux state
-          const profileResponse = user;
-          const isAdmin = profileResponse?.role === 'Admin';
-          console.log(isAdmin);
-          if (isAdmin) {
-            navigate(AppRoutes.dashboard);
-          } else {
-            navigate(AppRoutes.home);
-          }
-          toast.success('Đăng nhập thành công');
-        })
-        .catch(() => {
-          toast.error('Failed to fetch user profile.');
-        });
+        dispatch(fetchUserProfile())
+          .then(() => {
+            toast.success("Đăng nhập thành công");
+          })
+          .catch(() => {
+            toast.error("Failed to fetch user profile.");
+          })
+          .finally(() => {
+            const updatedUser = user;
+            const isAdmin = updatedUser?.role === "Admin";
+            console.log(isAdmin);
+            if (isAdmin) {
+              navigate(AppRoutes.dashboard);
+            } else {
+              navigate(AppRoutes.home);
+            }
+          });
       })
       .catch(() => {
-        toast.error('Email hoặc mật khẩu không chính xác.');
+        toast.error("Email hoặc mật khẩu không chính xác.");
       });
-    console.log(values);
   };
+  
 
   if (auth.isAuthenticated) return <Navigate to={AppRoutes.home} />;
 

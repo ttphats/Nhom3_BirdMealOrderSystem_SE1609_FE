@@ -12,28 +12,16 @@ import { useAppSelector } from "../../../../redux/hooks";
 import { useNavigate } from "react-router-dom";
 import AppRoutes from "../../../../router/AppRoutes";
 import { useEffect } from "react";
-import adminApi from "../../../../modules/Admin/apis/adminApi";
 
 const Dashboard1 = () => {
   const user = useAppSelector((state) => state.profile.user.data);
   const navigate = useNavigate();
 
-  const fetchRevenue = () => {
-    adminApi
-    .getRevenue().then((response: any) => {
-      console.log(response.data);
-    })
-  };
-
-  useEffect(() => {
-    fetchRevenue();
-  },[])
-
   useEffect(() => {
     if (user.role === "Admin") {
       navigate(AppRoutes.dashboard);
     } else {
-      navigate(AppRoutes.home);
+      navigate(AppRoutes.combo);
     }
   }, [user]);
 
