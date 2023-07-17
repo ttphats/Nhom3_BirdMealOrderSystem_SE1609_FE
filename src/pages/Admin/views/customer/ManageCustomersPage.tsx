@@ -20,7 +20,7 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Block, Edit } from "@mui/icons-material";
 import adminApi from "../../../../modules/Admin/apis/adminApi";
 import { Account } from "../../../../modules/Admin/models/Account";
 import { toast } from "react-toastify";
@@ -108,7 +108,6 @@ const ManageCustomerPage = () => {
             });
             console.log(err);
           });
-        setTableData([...tableData]);
         exitEditingMode();
       }
     };
@@ -122,7 +121,7 @@ const ManageCustomerPage = () => {
       const id: number = row.getValue("id");
 
       if (
-        !confirm(`Are you sure you want to delete ${row.getValue("fullname")}`)
+        !confirm(`Are you sure you want to ban ${row.getValue("fullname")}`)
       ) {
         return;
       }
@@ -132,15 +131,13 @@ const ManageCustomerPage = () => {
         .then(() => {
           // Delete the row from the tableData state variable
           const updatedTableData = [...tableData];
-          updatedTableData.splice(row.index, 1);
           setTableData(updatedTableData);
-          toast.success("Deleted Successfully");
+          window.location.reload();
+          toast.success("Banned Account Successfully");
         })
         .catch((err) => {
           console.log(err);
         });
-      tableData.splice(row.index, 1);
-      setTableData([...tableData]);
     },
     [tableData]
   );
@@ -272,9 +269,9 @@ const ManageCustomerPage = () => {
                 <Edit />
               </IconButton>
             </Tooltip>
-            <Tooltip arrow placement="right" title="Delete">
+            <Tooltip arrow placement="right" title="Ban">
               <IconButton color="error" onClick={() => handleDeleteRow(row)}>
-                <Delete />
+                <Block />
               </IconButton>
             </Tooltip>
           </Box>
