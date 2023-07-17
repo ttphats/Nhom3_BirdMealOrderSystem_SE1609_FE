@@ -28,7 +28,7 @@ const SalesOverview = () => {
   useEffect(() => {
     fetchRevenue();
     console.log(price);
-  }, []);
+  }, [price]);
 
   const optionssalesoverview: ApexCharts.ApexOptions = {
     grid: {

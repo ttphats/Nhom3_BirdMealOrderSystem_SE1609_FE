@@ -97,7 +97,7 @@ export default function ProductPage() {
 
   const fetchListProduct = (sortOption: string, page: number) => {
     productApi
-      .fetch(sortOption, page, itemsPerPage)
+      .staffFetchAll(sortOption, page, itemsPerPage)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((response: any) => {
         const { data, pagination } = response;

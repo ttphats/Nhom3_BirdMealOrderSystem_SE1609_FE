@@ -3,6 +3,14 @@ import { Product } from "../models";
 
 const productApi = {
   fetchAll: (): Promise<Product[]> => AxiosClient.get(`/guest/Products`),
+  staffFetchAll: (
+    sortOption: string,
+    page: number,
+    pageSize: number
+  ): Promise<Product[]> =>
+    AxiosClient.get(
+      `/Products?descending=${sortOption}&page=${page}&pageSize=${pageSize}`
+    ),
   fetch: (
     sortOption: string,
     page: number,

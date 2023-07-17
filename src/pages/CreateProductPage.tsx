@@ -19,6 +19,7 @@ import { useState } from "react";
 import { CreateProductForm } from "../modules/Product/models";
 import productApi from "../modules/Product/apis/productApi";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CreateProductPage = () => {
   const {
@@ -26,6 +27,7 @@ const CreateProductPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
   const [fileUpload, setFileUpLoad] = useState<File | null>(null);
   const today = new Date();
 
@@ -54,8 +56,9 @@ const CreateProductPage = () => {
 
       productApi
         .create(formData)
-        .then((response) => {
-          toast.success(response.data.message);
+        .then(() => {
+          toast.success('Tạo sản phẩm thành công');
+          navigate('/product', {replace: true})
         })
         .catch((error) => {
           toast.error("Something went wrong. Please check again!");

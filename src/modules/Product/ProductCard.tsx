@@ -19,7 +19,7 @@ import { Product } from "./models";
 import { useAppSelector } from "../../redux/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import AppRoutes from "../../router/AppRoutes";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import { useState } from "react";
 import productApi from "./apis/productApi";
@@ -30,12 +30,9 @@ type Props = {
   handleAddToCart: (clickedItem: Product) => void;
 };
 
-const StyledInfo = styled("div")(({ theme }) => ({
+const StyledInfo = styled("div")(() => ({
   display: "flex",
-  flexWrap: "wrap",
   justifyContent: "flex-end",
-  marginTop: theme.spacing(1),
-  color: theme.palette.text.disabled,
 }));
 
 export default function ProductCard({ item, handleAddToCart }: Props) {
@@ -50,7 +47,8 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
     productApi
       .delete(id)
       .then(() => {
-        toast.success("Delete successfully");
+        window.location.reload();
+        toast.success("Huỷ kích hoạt sản phẩm thành công");
         setOpenDialog(false);
       })
       .catch((err) => {
@@ -65,7 +63,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
     <Card
       sx={{
         width: "270px",
-        height: "390px",
+        height: "420px",
         backgroundColor: "#272d40",
         borderRadius: 3,
         display: "flex",
@@ -117,8 +115,6 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
             textAlign: "left",
             p: 0,
             marginLeft: 2,
-            position: "relative",
-            bottom: "25px",
             mt: 1,
           }}
         >
@@ -142,40 +138,8 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           </Typography>
         </CardContent>
       </Link>
-
-      {/* Staff Action Block */}
-      {user.role == "Staff" && (
-        <CardActions
-          disableSpacing
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            bottom: 0,
-          }}
-        >
-          <IconButton
-            aria-label="add to favorites"
-            sx={{ color: "red" }}
-            onClick={handleDelete}
-          >
-            <DeleteForeverIcon />
-          </IconButton>
-          <Link to={`/editProduct/${item.id}`}>
-            <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
-              <EditIcon />
-            </IconButton>
-          </Link>
-        </CardActions>
-      )}
-
       {item.status == "Active" && user.role == "Staff" ? (
-        <StyledInfo
-          sx={{
-            justifyContent: "flex-end",
-            position: "relative",
-            bottom: "15px",
-          }}
-        >
+        <StyledInfo>
           <Box
             key={item.id}
             sx={{
@@ -197,13 +161,29 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
         <></>
       )}
       {item.status == "OutOfStock" && user.role == "Staff" ? (
-        <StyledInfo
-          sx={{
-            justifyContent: "flex-end",
-            position: "relative",
-            bottom: "15px",
-          }}
-        >
+        <StyledInfo>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon
+              sx={{ width: 16, height: 16, mr: 0.5, color: "orange" }}
+            />
+            <Typography sx={{ color: "red" }} variant="caption">
+              OutOfStock
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
+      {item.status == "InActive" && user.role == "Staff" ? (
+        <StyledInfo>
           <Box
             key={item.id}
             sx={{
@@ -215,13 +195,37 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           >
             <CircleIcon sx={{ width: 16, height: 16, mr: 0.5, color: "red" }} />
             <Typography sx={{ color: "red" }} variant="caption">
-              OutOfStock
+              InActive
             </Typography>
           </Box>
         </StyledInfo>
       ) : (
         <></>
       )}
+
+      {/* Staff Action Block */}
+      <CardActions
+        disableSpacing
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          bottom: 0,
+        }}
+      >
+        {user.role == "Staff" && item.status != "InActive" && (
+          <IconButton sx={{ color: "orange" }} onClick={handleDelete}>
+            <ChangeCircleIcon />
+          </IconButton>
+        )}
+        {user.role == "Staff" && (
+          <Link to={`/editProduct/${item.id}`}>
+            <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
+              <EditIcon />
+            </IconButton>
+          </Link>
+        )}
+      </CardActions>
+
       {/* Customer Action Block */}
       {user.role == "Customer" && (
         <CardActions
@@ -268,7 +272,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
       )}
       <Dialog open={openDialog} onClose={handleCancelDelete}>
         <DialogTitle>
-          Confirm to delete <strong>{item?.name}</strong>
+          Confirm to InActive <strong>{item?.name}</strong>
         </DialogTitle>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Cancel</Button>
@@ -277,7 +281,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
             variant="contained"
             color="error"
           >
-            Delete
+            InActive
           </Button>
         </DialogActions>
       </Dialog>
