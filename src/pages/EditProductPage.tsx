@@ -13,22 +13,23 @@ import {
 import { CreateProductForm, Product } from "../modules/Product/models";
 import productApi from "../modules/Product/apis/productApi";
 import { toast } from "react-toastify";
-import {
-  Controller,
-  FieldError,
-  useForm,
-} from "react-hook-form";
+import { Controller, FieldError, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import AppRoutes from "../router/AppRoutes";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { useAppSelector } from "../redux/hooks";
+
+dayjs.extend(utc);
 
 const EditProductPage = () => {
   const {
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
   const [fileUpload, setFileUpload] = useState<File | null>(null);
@@ -43,24 +44,42 @@ const EditProductPage = () => {
   );
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.profile.user.data);
 
   const fetchProductData = async () => {
     if (id) {
       const productId = parseInt(id, 10);
-      await productApi
-        .getDetails(productId)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then((response: any) => {
-          const product = response.data;
-          setProductData(product);
-          setNameValue(product?.name || "");
-          setDescriptionValue(product?.description || "");
-          setUnitInStockValue(product?.unitInStock);
-          setPriceValue(product?.price);
-          setExpiredDateValue(product?.expiredDate || null);
-          setImagePreview(product?.imgUrl || null);
-        })
-        .catch((err) => console.log(err));
+      if (user.id != '') {
+        await productApi
+          .getDetailsForAuth(productId)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((response: any) => {
+            const product = response.data;
+            setProductData(product);
+            setNameValue(product?.name || "");
+            setDescriptionValue(product?.description || "");
+            setUnitInStockValue(product?.unitInStock);
+            setPriceValue(product?.price);
+            setExpiredDateValue(product?.expiredDate || null);
+            setImagePreview(product?.imgUrl || null);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        await productApi
+          .getDetails(productId)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((response: any) => {
+            const product = response.data;
+            setProductData(product);
+            setNameValue(product?.name || "");
+            setDescriptionValue(product?.description || "");
+            setUnitInStockValue(product?.unitInStock);
+            setPriceValue(product?.price);
+            setExpiredDateValue(product?.expiredDate || null);
+            setImagePreview(product?.imgUrl || null);
+          })
+          .catch((err) => console.log(err));
+      }
     }
   };
 
@@ -68,7 +87,9 @@ const EditProductPage = () => {
     fetchProductData();
   }, [id]);
 
-  console.log(expiredDateValue);
+  const formattedExpiredDateValue = expiredDateValue
+    ? dayjs(expiredDateValue).local()
+    : null;
 
   const validateName = (value: string) => {
     if (value === productData?.name || !value.trim()) {
@@ -105,22 +126,24 @@ const EditProductPage = () => {
     );
   };
 
-  const validateExpiredDate = (value: Date | null) => {
-    console.log("date", value);
+  const validateExpiredDate = (value: Date | null | undefined) => {
+    if (value === null || (value && productData?.expiredDate)) {
+      return true;
+    }
+  
     if (value) {
-      const selectedDate = new Date(value);
-      const currentDate = new Date();
-
-      if (selectedDate > currentDate) {
+      const selectedDate = dayjs(value).startOf("day"); // Use local time
+      const currentDate = dayjs().startOf("day");
+  
+      if (selectedDate.isAfter(currentDate)) {
         return true;
       } else {
         return "Expired Date must be greater than today";
       }
     }
-
+  
     return true;
   };
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     if (!fileUpload && imagePreview) {
@@ -169,6 +192,13 @@ const EditProductPage = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
+
+  useEffect(() => {
+    const normalizedDate = expiredDateValue ? dayjs.utc(expiredDateValue).local() : null;
+    if (normalizedDate) {
+      setValue("ExpiredDate", normalizedDate.toDate());
+    }
+  }, [expiredDateValue, setValue]);
 
   return (
     <>
@@ -263,12 +293,12 @@ const EditProductPage = () => {
                 <Controller
                   control={control}
                   name="ExpiredDate"
-                  defaultValue={productData?.expiredDate || new Date()}
+                  defaultValue={formattedExpiredDateValue}
                   render={({ field }) => (
                     <DatePicker
                       {...field}
                       label="Expired Date"
-                      value={expiredDateValue ? dayjs(expiredDateValue) : null}
+                      value={field.value ? dayjs.utc(field.value) : null}
                       shouldDisableDate={(day) => dayjs().isAfter(day)}
                     />
                   )}
@@ -308,7 +338,7 @@ const EditProductPage = () => {
                 fullWidth
                 margin="normal"
               />
-              {imagePreview && ( 
+              {imagePreview && (
                 <img
                   src={imagePreview}
                   alt="Image Preview"

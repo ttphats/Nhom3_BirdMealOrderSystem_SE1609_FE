@@ -4,7 +4,7 @@ export interface CreateProductForm {
     Description: string;
     UnitInStock: number;
     Price: number;
-    ExpiredDate: Date;
+    ExpiredDate: Date | null | undefined;
     Status: number;
   };
   imageFile: File | null;

@@ -138,7 +138,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           </Typography>
         </CardContent>
       </Link>
-      {item.status == "Active" && user.role == "Staff" ? (
+      {item.status == "Active" && (user.role == "Staff" || user.role == "Admin" )  ? (
         <StyledInfo>
           <Box
             key={item.id}
@@ -160,7 +160,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
       ) : (
         <></>
       )}
-      {item.status == "OutOfStock" && user.role == "Staff" ? (
+      {item.status == "OutOfStock" && (user.role == "Staff" || user.role == "Admin" )  ? (
         <StyledInfo>
           <Box
             key={item.id}
@@ -182,7 +182,7 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
       ) : (
         <></>
       )}
-      {item.status == "InActive" && user.role == "Staff" ? (
+      {item.status == "InActive" && (user.role == "Staff" || user.role == "Admin" ) ? (
         <StyledInfo>
           <Box
             key={item.id}
@@ -212,12 +212,12 @@ export default function ProductCard({ item, handleAddToCart }: Props) {
           bottom: 0,
         }}
       >
-        {user.role == "Staff" && item.status != "InActive" && (
+        {(user.role == "Staff" || user.role == "Admin") && item.status != "InActive" && (
           <IconButton sx={{ color: "orange" }} onClick={handleDelete}>
             <ChangeCircleIcon />
           </IconButton>
         )}
-        {user.role == "Staff" && (
+        {(user.role == "Staff" || user.role == "Admin") && (
           <Link to={`/editProduct/${item.id}`}>
             <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
               <EditIcon />

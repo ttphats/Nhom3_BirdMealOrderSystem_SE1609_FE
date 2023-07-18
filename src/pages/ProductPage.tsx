@@ -96,9 +96,9 @@ export default function ProductPage() {
   };
 
   const fetchListProduct = (sortOption: string, page: number) => {
-    if (user.role == "Staff" || user.role == "Admin") {
+    if (user.id != '') {
       productApi
-        .staffFetchAll(sortOption, page, itemsPerPage)
+        .authFetchAll(sortOption, page, itemsPerPage)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((response: any) => {
           const { data, pagination } = response;

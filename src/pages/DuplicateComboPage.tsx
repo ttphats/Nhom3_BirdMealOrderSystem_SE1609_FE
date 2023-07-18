@@ -27,6 +27,7 @@ import { BirdSpecies, Combo, CreateComboForm } from "../modules/Combo/models";
 import { FieldError, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import AppRoutes from "../router/AppRoutes";
+import { useAppSelector } from "../redux/hooks";
 
 const DuplicateComboPage = () => {
   const {
@@ -49,11 +50,35 @@ const DuplicateComboPage = () => {
   const [descriptionValue, setDescriptionValue] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.profile.user.data);
+
 
   const fetchComboData = async () => {
     if (id) {
       const comboId = parseInt(id, 10);
-      await comboApi
+      if(user.id != ''){
+        await comboApi
+        .getDetailsForAuth(comboId)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const combo = response.data;
+          setComboData(combo);
+          setNameValue(combo?.name || "");
+          setDescriptionValue(combo?.description || "");
+          setImagePreview(combo?.imgUrl || null);
+          setSelectedProducts(
+            combo?.products.map((product: Product) => ({
+              productId: product.id,
+              quantity: parseInt(product.quantity, 10),
+            })) || []
+          );
+          setSelectedBirdSpecies(
+            combo?.birdSpecies.map((bird: BirdSpecies) => bird.id) || []
+          );
+        })
+        .catch((err) => console.log(err));
+      } else {
+        await comboApi
         .getDetails(comboId)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .then((response: any) => {
@@ -73,6 +98,7 @@ const DuplicateComboPage = () => {
           );
         })
         .catch((err) => console.log(err));
+      }
     }
   };
 

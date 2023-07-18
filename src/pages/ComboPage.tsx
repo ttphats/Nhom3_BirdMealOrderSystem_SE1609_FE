@@ -99,17 +99,31 @@ export default function ComboPage() {
     }
   };
   const fetchListCombo = (sortOption: string, birdId: string, page: number) => {
-    comboApi
-      .fetch(sortOption, birdId, page, itemsPerPage)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .then((response: any) => {
-        const { data, pagination } = response;
-        const { totalPages } = pagination;
-        setCombos(data);
-        setCurrentPage(page);
-        setTotalPages(totalPages);
-      })
-      .catch((err) => console.log(err));
+    if (user.id != '') {
+      comboApi
+        .authFetch(sortOption, birdId, page, itemsPerPage)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const { data, pagination } = response;
+          const { totalPages } = pagination;
+          setCombos(data);
+          setCurrentPage(page);
+          setTotalPages(totalPages);
+        })
+        .catch((err) => console.log(err));
+    } else {
+      comboApi
+        .fetch(sortOption, birdId, page, itemsPerPage)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((response: any) => {
+          const { data, pagination } = response;
+          const { totalPages } = pagination;
+          setCombos(data);
+          setCurrentPage(page);
+          setTotalPages(totalPages);
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   const fetchListBird = () => {

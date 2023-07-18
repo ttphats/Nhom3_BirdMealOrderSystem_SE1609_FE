@@ -11,7 +11,7 @@ export type Combo = {
   updatedDate: string;
   price: number;
   imgUrl: string;
-  status: boolean;
+  status: string;
   products: Product[];
   birdSpecies: BirdSpecies[];
 };

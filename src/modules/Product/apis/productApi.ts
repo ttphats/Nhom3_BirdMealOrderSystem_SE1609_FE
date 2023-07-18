@@ -3,7 +3,7 @@ import { Product } from "../models";
 
 const productApi = {
   fetchAll: (): Promise<Product[]> => AxiosClient.get(`/guest/Products`),
-  staffFetchAll: (
+  authFetchAll: (
     sortOption: string,
     page: number,
     pageSize: number
@@ -36,6 +36,8 @@ const productApi = {
   delete: (id: number) => AxiosClient.delete(`/staff/Products/${id}`),
   getDetails: (id: number): Promise<Product> =>
     AxiosClient.get(`/guest/Products/${id}`),
+  getDetailsForAuth: (id: number): Promise<Product> =>
+    AxiosClient.get(`/Products/${id}`),
 };
 
 export default productApi;

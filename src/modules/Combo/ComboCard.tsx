@@ -5,9 +5,8 @@ import CardContent from "@mui/material/CardContent";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
-import DifferenceIcon from '@mui/icons-material/Difference';
+import DifferenceIcon from "@mui/icons-material/Difference";
 
 import {
   Box,
@@ -16,6 +15,7 @@ import {
   DialogActions,
   DialogTitle,
   Typography,
+  styled,
 } from "@mui/material";
 import { Combo } from "./models";
 import { useAppSelector } from "../../redux/hooks";
@@ -24,11 +24,18 @@ import AppRoutes from "../../router/AppRoutes";
 import comboApi from "./apis/comboApi";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import CircleIcon from "@mui/icons-material/Circle";
+import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
 
 type Props = {
   item: Combo;
   handleAddToCart: (clickedItem: Combo) => void;
 };
+
+const StyledInfo = styled("div")(() => ({
+  display: "flex",
+  justifyContent: "flex-end",
+}));
 
 export default function ComboCard({ item, handleAddToCart }: Props) {
   const user = useAppSelector((state) => state.profile.user.data);
@@ -42,7 +49,8 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
     comboApi
       .delete(id)
       .then(() => {
-        toast.success("Delete successfully");
+        window.location.reload();
+        toast.success("Huỷ kích hoạt combo thành công");
         setOpenDialog(false);
       })
       .catch((err) => {
@@ -57,7 +65,7 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
     <Card
       sx={{
         width: "270px",
-        height: "390px",
+        height: "420px",
         backgroundColor: "#272d40",
         borderRadius: 3,
         display: "flex",
@@ -136,36 +144,104 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
           </Typography>
         </CardContent>
       </Link>
+      {item.status == "Active" &&
+      (user.role == "Staff" || user.role == "Admin") ? (
+        <StyledInfo>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon
+              sx={{ width: 16, height: 16, mr: 0.5, color: "lightgreen" }}
+            />
+            <Typography sx={{ color: "lightgreen" }} variant="caption">
+              Active
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
+      {item.status == "OutOfStock" &&
+      (user.role == "Staff" || user.role == "Admin") ? (
+        <StyledInfo>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon
+              sx={{ width: 16, height: 16, mr: 0.5, color: "orange" }}
+            />
+            <Typography sx={{ color: "red" }} variant="caption">
+              OutOfStock
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
+      {item.status == "InActive" &&
+      (user.role == "Staff" || user.role == "Admin") ? (
+        <StyledInfo>
+          <Box
+            key={item.id}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: 2,
+              bottom: 1,
+            }}
+          >
+            <CircleIcon sx={{ width: 16, height: 16, mr: 0.5, color: "red" }} />
+            <Typography sx={{ color: "red" }} variant="caption">
+              InActive
+            </Typography>
+          </Box>
+        </StyledInfo>
+      ) : (
+        <></>
+      )}
 
       {/* Staff Action Block */}
-      {user.role == "Staff" && (
-        <CardActions
-          disableSpacing
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            bottom: 0,
-          }}
-        >
-          <IconButton
-            aria-label="add to favorites"
-            sx={{ color: "red" }}
-            onClick={handleDelete}
-          >
-            <DeleteForeverIcon />
-          </IconButton>
-          <Link to={`/duplicateCombo/${item.id}`}>
-            <IconButton aria-label="share" sx={{ color: "lightpink" }}>
-              <DifferenceIcon />
+      <CardActions
+        disableSpacing
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          bottom: 0,
+        }}
+      >
+        {(user.role == "Staff" || user.role == "Admin") &&
+          item.status != "InActive" && (
+            <IconButton sx={{ color: "orange" }} onClick={handleDelete}>
+              <ChangeCircleIcon />
             </IconButton>
-          </Link>
-          <Link to={`/editCombo/${item.id}`}>
-            <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
-              <EditIcon />
-            </IconButton>
-          </Link>
-        </CardActions>
-      )}
+          )}
+        {(user.role == "Staff" || user.role == "Admin") && (
+          <>
+            <Link to={`/duplicateCombo/${item.id}`}>
+              <IconButton aria-label="share" sx={{ color: "lightpink" }}>
+                <DifferenceIcon />
+              </IconButton>
+            </Link>
+            <Link to={`/editCombo/${item.id}`}>
+              <IconButton aria-label="share" sx={{ color: "lightgreen" }}>
+                <EditIcon />
+              </IconButton>
+            </Link>
+          </>
+        )}
+      </CardActions>
       {/* Customer Action Block */}
 
       {user.role == "Customer" && (
@@ -213,7 +289,9 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
         </CardActions>
       )}
       <Dialog open={openDialog} onClose={handleCancelDelete}>
-        <DialogTitle>Confirm to delete <strong>{item?.name}</strong></DialogTitle>
+        <DialogTitle>
+          Xác nhận huỷ kích hoạt <strong>{item?.name}</strong>
+        </DialogTitle>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Cancel</Button>
           <Button
@@ -221,7 +299,7 @@ export default function ComboCard({ item, handleAddToCart }: Props) {
             variant="contained"
             color="error"
           >
-            Delete
+            InActive
           </Button>
         </DialogActions>
       </Dialog>

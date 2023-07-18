@@ -125,14 +125,25 @@ export default function ProductDetailsPage() {
   const fetchProductDetails = () => {
     if (typeof id === "string") {
       const productId = parseInt(id, 10);
-      productApi
-        .getDetails(productId)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .then((response: any) => {
-          const product = response.data;
-          setProduct(product);
-        })
-        .catch((err) => console.log(err));
+      if (user.id != "") {
+        productApi
+          .getDetailsForAuth(productId)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((response: any) => {
+            const product = response.data;
+            setProduct(product);
+          })
+          .catch((err) => console.log(err));
+      } else {
+        productApi
+          .getDetails(productId)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((response: any) => {
+            const product = response.data;
+            setProduct(product);
+          })
+          .catch((err) => console.log(err));
+      }
     }
   };
 
@@ -261,8 +272,9 @@ export default function ProductDetailsPage() {
               </Typography>
               <Typography variant="body2">
                 <strong>Expired Date: </strong>
-                {product?.expiredDate &&
-                  new Date(product.expiredDate).toLocaleDateString("vi-VN")  || "N/A"}
+                {(product?.expiredDate &&
+                  new Date(product.expiredDate).toLocaleDateString("vi-VN")) ||
+                  "N/A"}
               </Typography>
               <Typography variant="h6">
                 Price:{" "}
@@ -296,7 +308,11 @@ export default function ProductDetailsPage() {
                   Delete
                 </Button>
                 <Link to={`/editProduct/${id}`}>
-                  <Button variant="contained" endIcon={<EditIcon />} sx={{backgroundColor: 'lightseagreen'}}>
+                  <Button
+                    variant="contained"
+                    endIcon={<EditIcon />}
+                    sx={{ backgroundColor: "lightseagreen" }}
+                  >
                     Edit
                   </Button>
                 </Link>
@@ -333,262 +349,45 @@ export default function ProductDetailsPage() {
           >
             Feedbacks
           </Typography>
-          <Paper
-            sx={{
-              height: 70,
-              m: "auto",
-              mt: 2,
-              display: "flex",
-              alignItems: "center",
-              width: "90%",
-            }}
-          >
-            <Avatar
-              alt="User Avatar"
-              src="/static/images/avatar/1.jpg"
-              sx={{ ml: 2 }}
-            />
-            <TextField
-              label="Add your feedback here"
-              variant="outlined"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              sx={{ flex: 1, ml: 2, mr: 2 }}
-            />
-            <Button
-              variant="contained"
-              onClick={submitFeedback}
-              startIcon={<SendIcon />}
-              sx={{mr: 2}}
+          {user.role === "Customer" && (
+            <Paper
+              sx={{
+                height: 70,
+                m: "auto",
+                mt: 2,
+                display: "flex",
+                alignItems: "center",
+                width: "90%",
+              }}
             >
-              Send
-            </Button>
-          </Paper>
-          {feedbackData.map((feedbackItem) => (
-            <>
-              <Paper
-                key={feedbackItem.id}
-                sx={{ width: "90%", m: "auto", mt: 4 }}
+              <Avatar
+                alt="User Avatar"
+                src="/static/images/avatar/1.jpg"
+                sx={{ ml: 2 }}
+              />
+              <TextField
+                label="Add your feedback here"
+                variant="outlined"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                sx={{ flex: 1, ml: 2, mr: 2 }}
+              />
+              <Button
+                variant="contained"
+                onClick={submitFeedback}
+                startIcon={<SendIcon />}
+                sx={{ mr: 2 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                  }}
-                >
-                  <Avatar alt="User Avatar" sx={{ ml: 2 }} />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "flex-start",
-                      ml: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontSize: "20px",
-                        fontWeight: 700,
-                        color: "#363636",
-                      }}
-                    >
-                      {feedbackItem?.customer?.email}
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          border: 1,
-                          borderColor: "orange",
-                          minWidth: "80px",
-                          borderRadius: 1,
-                          height: "18px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            color: "orange",
-                          }}
-                        >
-                          Customer
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          border: 1,
-                          borderColor: "#ccc",
-                          minWidth: "80px",
-                          borderRadius: 1,
-                          height: "18px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          ml: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            color: "#ccc",
-                          }}
-                        >
-                          {feedbackItem?.createdDate &&
-                            new Date(
-                              feedbackItem.createdDate
-                            ).toLocaleTimeString("vi-VN")}
-                          &nbsp;
-                          {feedbackItem?.createdDate &&
-                            new Date(
-                              feedbackItem.createdDate
-                            ).toLocaleDateString("vi-VN")}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontSize: "20px",
-                    fontWeight: 700,
-                    color: "#363636",
-                    p: 2,
-                    textAlign: "left",
-                  }}
-                >
-                  {feedbackItem?.content}
-                </Typography>
-                <Box
-                  sx={{
-                    borderTop: 1,
-                    borderTopColor: "#ccc",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      fontWeight: 700,
-                      color: "#363636",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      p: 1.5,
-                    }}
-                  >
-                    <FavoriteIcon sx={{ fontSize: "15px" }} />
-
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "10px", ml: "5px" }}
-                    >
-                      Yêu thích
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      fontWeight: 700,
-                      color: "#363636",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      p: 1.5,
-                      "&:hover": {
-                        cursor: "pointer",
-                        backgroundColor: "#f8f8f8",
-                      },
-                    }}
-                    onClick={() =>
-                      isShowReply ? setIsShowReply(false) : setIsShowReply(true)
-                    }
-                  >
-                    <ChatBubbleIcon sx={{ fontSize: "15px" }} />
-
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "10px", ml: "5px" }}
-                    >
-                      Reply
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      fontWeight: 700,
-                      color: "#363636",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      p: 1.5,
-                    }}
-                  >
-                    <ReportProblemIcon sx={{ fontSize: "15px" }} />
-
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "10px", ml: "5px" }}
-                    >
-                      Báo cáo
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-              {user.role == "Staff" &&
-                isShowReply &&
-                feedbackItem.replyContent === null && (
-                  <Paper
-                    sx={{
-                      height: 70,
-                      m: "auto",
-                      mt: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      width: "80%",
-                      ml: 12,
-                    }}
-                  >
-                    <Avatar
-                      alt="User Avatar"
-                      src="/static/images/avatar/1.jpg"
-                      sx={{ ml: 2 }}
-                    />
-                    <TextField
-                      label="Add your reply here"
-                      variant="outlined"
-                      value={reply}
-                      onChange={(e) => setReply(e.target.value)}
-                      sx={{ flex: 1, ml: 2, mr: 2 }}
-                    />
-                    <Button
-                      variant="contained"
-                      onClick={() => submitReply(feedbackItem.id)}
-                      startIcon={<SendIcon />}
-                      sx={{ mr: 2 }}
-                    >
-                      Reply
-                    </Button>
-                  </Paper>
-                )}
-              {isShowReply && feedbackItem.replyContent !== null && (
+                Send
+              </Button>
+            </Paper>
+          )}
+          {feedbackData.length > 0 ? (
+            feedbackData.map((feedbackItem) => (
+              <>
                 <Paper
                   key={feedbackItem.id}
-                  sx={{ width: "80%", m: "auto", mt: 1, ml: 12 }}
+                  sx={{ width: "90%", m: "auto", mt: 4 }}
                 >
                   <Box
                     sx={{
@@ -615,7 +414,7 @@ export default function ProductDetailsPage() {
                           color: "#363636",
                         }}
                       >
-                        staff@gmail.com
+                        {feedbackItem?.customer?.email}
                       </Typography>
                       <Box
                         sx={{
@@ -644,7 +443,7 @@ export default function ProductDetailsPage() {
                               color: "orange",
                             }}
                           >
-                            Staff
+                            Customer
                           </Typography>
                         </Box>
                         <Box
@@ -668,14 +467,14 @@ export default function ProductDetailsPage() {
                               color: "#ccc",
                             }}
                           >
-                            {feedbackItem?.repliedDate &&
+                            {feedbackItem?.createdDate &&
                               new Date(
-                                feedbackItem.repliedDate
+                                feedbackItem.createdDate
                               ).toLocaleTimeString("vi-VN")}
                             &nbsp;
-                            {feedbackItem?.repliedDate &&
+                            {feedbackItem?.createdDate &&
                               new Date(
-                                feedbackItem.repliedDate
+                                feedbackItem.createdDate
                               ).toLocaleDateString("vi-VN")}
                           </Typography>
                         </Box>
@@ -692,7 +491,7 @@ export default function ProductDetailsPage() {
                       textAlign: "left",
                     }}
                   >
-                    {feedbackItem?.replyContent}
+                    {feedbackItem?.content}
                   </Typography>
                   <Box
                     sx={{
@@ -730,6 +529,34 @@ export default function ProductDetailsPage() {
                         alignItems: "center",
                         justifyContent: "center",
                         p: 1.5,
+                        "&:hover": {
+                          cursor: "pointer",
+                          backgroundColor: "#f8f8f8",
+                        },
+                      }}
+                      onClick={() =>
+                        isShowReply
+                          ? setIsShowReply(false)
+                          : setIsShowReply(true)
+                      }
+                    >
+                      <ChatBubbleIcon sx={{ fontSize: "15px" }} />
+
+                      <Typography
+                        variant="body2"
+                        sx={{ fontSize: "10px", ml: "5px" }}
+                      >
+                        Reply
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        fontWeight: 700,
+                        color: "#363636",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        p: 1.5,
                       }}
                     >
                       <ReportProblemIcon sx={{ fontSize: "15px" }} />
@@ -743,21 +570,221 @@ export default function ProductDetailsPage() {
                     </Box>
                   </Box>
                 </Paper>
-              )}
-              {isShowReply &&
-                user.role == "Customer" &&
-                feedbackItem.replyContent === null && (
+                {user.role == "Staff" &&
+                  isShowReply &&
+                  feedbackItem.replyContent === null && (
+                    <Paper
+                      sx={{
+                        height: 70,
+                        m: "auto",
+                        mt: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        width: "80%",
+                        ml: 12,
+                      }}
+                    >
+                      <Avatar
+                        alt="User Avatar"
+                        src="/static/images/avatar/1.jpg"
+                        sx={{ ml: 2 }}
+                      />
+                      <TextField
+                        label="Add your reply here"
+                        variant="outlined"
+                        value={reply}
+                        onChange={(e) => setReply(e.target.value)}
+                        sx={{ flex: 1, ml: 2, mr: 2 }}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={() => submitReply(feedbackItem.id)}
+                        startIcon={<SendIcon />}
+                        sx={{ mr: 2 }}
+                      >
+                        Reply
+                      </Button>
+                    </Paper>
+                  )}
+                {isShowReply && feedbackItem.replyContent !== null && (
                   <Paper
                     key={feedbackItem.id}
-                    sx={{ width: "90%", m: "auto", mt: 1}}
+                    sx={{ width: "80%", m: "auto", mt: 1, ml: 12 }}
                   >
-                    <Typography variant="h6" color={"#000"}>
-                      Nhân viên chưa phản hồi
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Avatar alt="User Avatar" sx={{ ml: 2 }} />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "flex-start",
+                          ml: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontSize: "20px",
+                            fontWeight: 700,
+                            color: "#363636",
+                          }}
+                        >
+                          staff@gmail.com
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "flex-start",
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              border: 1,
+                              borderColor: "orange",
+                              minWidth: "80px",
+                              borderRadius: 1,
+                              height: "18px",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                color: "orange",
+                              }}
+                            >
+                              Staff
+                            </Typography>
+                          </Box>
+                          <Box
+                            sx={{
+                              border: 1,
+                              borderColor: "#ccc",
+                              minWidth: "80px",
+                              borderRadius: 1,
+                              height: "18px",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              ml: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                color: "#ccc",
+                              }}
+                            >
+                              {feedbackItem?.repliedDate &&
+                                new Date(
+                                  feedbackItem.repliedDate
+                                ).toLocaleTimeString("vi-VN")}
+                              &nbsp;
+                              {feedbackItem?.repliedDate &&
+                                new Date(
+                                  feedbackItem.repliedDate
+                                ).toLocaleDateString("vi-VN")}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontSize: "20px",
+                        fontWeight: 700,
+                        color: "#363636",
+                        p: 2,
+                        textAlign: "left",
+                      }}
+                    >
+                      {feedbackItem?.replyContent}
                     </Typography>
+                    <Box
+                      sx={{
+                        borderTop: 1,
+                        borderTopColor: "#ccc",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          fontWeight: 700,
+                          color: "#363636",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          p: 1.5,
+                        }}
+                      >
+                        <FavoriteIcon sx={{ fontSize: "15px" }} />
+
+                        <Typography
+                          variant="body2"
+                          sx={{ fontSize: "10px", ml: "5px" }}
+                        >
+                          Yêu thích
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          fontWeight: 700,
+                          color: "#363636",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          p: 1.5,
+                        }}
+                      >
+                        <ReportProblemIcon sx={{ fontSize: "15px" }} />
+
+                        <Typography
+                          variant="body2"
+                          sx={{ fontSize: "10px", ml: "5px" }}
+                        >
+                          Báo cáo
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Paper>
                 )}
+                {isShowReply &&
+                  feedbackItem.replyContent === null && (
+                    <Paper
+                      key={feedbackItem.id}
+                      sx={{ width: "90%", m: "auto", mt: 1 }}
+                    >
+                      <Typography variant="h6" color={"#000"}>
+                        Nhân viên chưa phản hồi
+                      </Typography>
+                    </Paper>
+                  )}
+              </>
+            ))
+          ) : (
+            <>
+              <Typography variant="h6" color={"#000"}>
+                Chưa có feedback nào cho sản phẩm này
+              </Typography>
             </>
-          ))}
+          )}
         </Box>
       </Stack>
     </>
